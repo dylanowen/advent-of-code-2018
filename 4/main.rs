@@ -9,14 +9,6 @@ extern crate chrono;
 
 struct Row(DateTime<Utc>, String);
 
-// struct Event<'a> {
-//    id: &'a str,
-//    x: usize,
-//    y: usize,
-//    width: usize,
-//    height: usize,
-// }
-
 fn main() {
    let re = Regex::new(r"\[(.*)\] (.+)").unwrap();
 
@@ -38,18 +30,21 @@ fn main() {
 
    rows.sort_by_key(|row| row.0);
 
+   // debug
    // for row in &rows {
    //    println!("{} {}", row.0, row.1);
    // }
 
-   a(&rows);
-   //b(&claims, &cloth);
+   let guard_schedules = calculate_guard_schedules(&rows);
+
+   a(&guard_schedules);
+   b(&guard_schedules);
 }
 
-fn a(rows: &Vec<Row>) {
+fn calculate_guard_schedules(rows: &Vec<Row>) -> HashMap<usize, [usize; 60]> {
    let re = Regex::new(r"#(\d+)").unwrap();
 
-   let mut guard_events = HashMap::new();
+   let mut guard_schedules = HashMap::new();
 
    let mut current_guard = 0;
    let mut guard_sleep_count = [0; 60];
@@ -77,8 +72,9 @@ fn a(rows: &Vec<Row>) {
          shift_row => {
             // write out our last guard
             if current_guard != 0 {
-               guard_events.insert(current_guard, guard_sleep_count);
+               guard_schedules.insert(current_guard, guard_sleep_count);
 
+               // debug
                // print!("{:4}: ", current_guard);
                // for count in guard_sleep_count.iter() {
                //    print!("{:2}", count);
@@ -89,7 +85,7 @@ fn a(rows: &Vec<Row>) {
             let shift_change = re.captures(shift_row).unwrap();
 
             current_guard = shift_change[1].parse::<usize>().unwrap();
-            guard_sleep_count = match guard_events.get(&current_guard) {
+            guard_sleep_count = match guard_schedules.get(&current_guard) {
                Some(last_sleep) => *last_sleep,
                _ => [0; 60],
             };
@@ -99,33 +95,38 @@ fn a(rows: &Vec<Row>) {
    }
 
    // write out our last guard
-   // guard_events.insert(current_guard, guard_sleep_count);
+   guard_schedules.insert(current_guard, guard_sleep_count);
+
+   // debug
    // print!("{:4}: ", current_guard);
    // for count in guard_sleep_count.iter() {
    //    print!("{:2}", count);
    // }
    // println!("");
+   // println!("Finished Counting");
 
-   println!("Finished Counting");
+   return guard_schedules;
+}
 
+fn a(guard_schedules: &HashMap<usize, [usize; 60]>) {
    let mut max_sleep = 0;
    let mut max_guard = 0;
-   for (id, &guard_event) in guard_events.iter() {
+   for (id, &guard_schedule) in guard_schedules.iter() {
       let mut sleep = 0;
 
-      for count in guard_event.iter() {
+      for count in guard_schedule.iter() {
          sleep += *count;
       }
 
       // debug
       // print!("{:4}: {:2} :", id, sleep);
-      // for count in guard_event.iter() {
+      // for count in guard_schedule.iter() {
       //    print!("{:2}", count);
       // }
       // println!("");
 
       if max_sleep < sleep {
-         println!("New Max: {}", sleep);
+         //println!("New Max: {}", sleep);
          max_sleep = sleep;
          max_guard = *id;
       }
@@ -133,7 +134,7 @@ fn a(rows: &Vec<Row>) {
 
    let mut max_minute = 0;
    let mut max_minute_count = 0;
-   for (minute, count) in guard_events.get(&max_guard).unwrap().iter().enumerate() {
+   for (minute, count) in guard_schedules.get(&max_guard).unwrap().iter().enumerate() {
       if max_minute_count < *count {
          max_minute_count = *count;
          max_minute = minute;
@@ -141,10 +142,14 @@ fn a(rows: &Vec<Row>) {
    }
 
    println!("Result A: {} * {} = {}", max_guard, max_minute, max_guard * max_minute);
+}
 
+fn b(guard_schedules: &HashMap<usize, [usize; 60]>) {
    let mut max_sleep_count = 0;
-   for (id, &guard_event) in guard_events.iter() {
-      for (minute, count) in guard_event.iter().enumerate() {
+   let mut max_guard = 0;
+   let mut max_minute = 0;
+   for (id, &guard_schedule) in guard_schedules.iter() {
+      for (minute, count) in guard_schedule.iter().enumerate() {
          if max_sleep_count < *count {
             max_sleep_count = *count;
             max_guard = *id;
@@ -155,30 +160,3 @@ fn a(rows: &Vec<Row>) {
 
    println!("Result B: {} * {} = {}", max_guard, max_minute, max_guard * max_minute);
 }
-/*
-fn b(claims: &Vec<Claim>, cloth: &Vec<Vec<i32>>) {
-   for claim in claims {
-      let mut overlap = 0;
-      for y in claim.y..(claim.y + claim.height) {
-         for x in claim.x..(claim.x + claim.width) {
-            if cloth[x][y] > 1 {
-               overlap += 1;
-            }
-         }
-      }
-
-      if overlap == 0 {
-         println!("Result B: {}", claim.id);
-         break;
-      }
-   }
-}
-
-fn fill_cloth(claim: &Claim, cloth: &mut Vec<Vec<i32>>) {
-   for y in claim.y..(claim.y + claim.height) {
-      for x in claim.x..(claim.x + claim.width) {
-         cloth[x][y] += 1;
-      }
-   }
-}
-*/
