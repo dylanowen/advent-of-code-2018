@@ -1,0 +1,12 @@
+[package]
+name = "main"
+version = "0.1.0"
+authors = ["Dylan Owen <dyltotheo@gmail.com>"]
+
+[dependencies]
+regex = "1"
+chrono = "0.4"
+
+[[bin]]
+name = "main"
+path = "main.rs"
