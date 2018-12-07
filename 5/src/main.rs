@@ -52,13 +52,12 @@ fn compress_polymer(polymer: &String) -> usize {
          match new_polymer.pop() {
             Some(popped) => {
                last = popped as u8;
-            },
+            }
             _ => {
                last = base_char;
-            },
+            }
          }
-      }
-      else {
+      } else {
          // check for our base case
          if last > base_char {
             new_polymer.push(last as char);

@@ -1,23 +1,19 @@
-use std::fs::File;
-use std::io::prelude::*;
+extern crate lib;
+
+use lib::*;
 use std::collections::BTreeSet;
 
 fn main() {
-   let mut f = File::open("input.txt").expect("file not found");
+   run_input("2", "input.txt", &|contents, _is_sample| {
+      let ids = contents.split_whitespace()
+         .collect();
 
-   let mut contents = String::new();
-   f.read_to_string(&mut contents)
-      .expect("something went wrong reading the file");
-
-   let ids = contents.split_whitespace()
-      .collect();
-
-   a(&ids);
-   b(&ids);
+      a(&ids);
+      b(&ids);
+   });
 }
 
 fn a(ids: &Vec<&str>) {
-
    let mut two = 0;
    let mut three = 0;
    for id in ids {
@@ -78,7 +74,7 @@ fn id_letter_count(id: &str) -> (i32, i32) {
       }
    }
 
-   return (two, three)
+   return (two, three);
 }
 
 fn id_diff(left: &str, right: &str) -> (i32, String) {
@@ -87,8 +83,7 @@ fn id_diff(left: &str, right: &str) -> (i32, String) {
    for (i, c) in left.chars().enumerate() {
       if c != right.chars().nth(i).unwrap() {
          diff += 1;
-      }
-      else {
+      } else {
          same.push(c);
       }
    }

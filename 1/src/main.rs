@@ -1,20 +1,17 @@
-use std::fs::File;
-use std::io::prelude::*;
+extern crate lib;
+
+use lib::*;
 use std::collections::BTreeSet;
 
 fn main() {
-   let mut f = File::open("input.txt").expect("file not found");
+   run_input("2", "input.txt", &|contents, _is_sample| {
+      let movements = contents.split_whitespace()
+         .map(|x| x.parse::<i32>().unwrap())
+         .collect();
 
-   let mut contents = String::new();
-   f.read_to_string(&mut contents)
-      .expect("something went wrong reading the file");
-
-   let movements = contents.split_whitespace()
-      .map(|x| x.parse::<i32>().unwrap())
-      .collect();
-
-   a(&movements);
-   b(&movements);
+      a(&movements);
+      b(&movements);
+   });
 }
 
 fn a(movements: &Vec<i32>) {
