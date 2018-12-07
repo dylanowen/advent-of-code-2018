@@ -1,0 +1,11 @@
+[package]
+name = "6"
+version = "0.1.0"
+authors = ["Dylan Owen <dyltotheo@gmail.com>"]
+
+[dependencies]
+lib = { path = "../lib" }
+regex = "1"
+
+[[bin]]
+name = "6"

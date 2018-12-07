@@ -1,31 +1,15 @@
-use std::fs::File;
-use std::io::prelude::*;
+extern crate lib;
+
+use lib::run_day;
 
 const ASCII_DIFF: i32 = ('a' as i32) - ('A' as i32);
 
 fn main() {
-   run("sample_input.txt");
-   println!("");
-   run("input.txt");
+   run_day("5", &|polymer, _is_sample| {
+      a(polymer);
+      b(polymer);
+   });
 }
-
-fn run(file_name: &str) {
-   let polymer = parse_input(file_name);
-
-   a(&polymer);
-   b(&polymer);
-}
-
-fn parse_input(file_name: &str) -> String {
-   let mut f = File::open(file_name).expect("file not found");
-
-   let mut contents = String::new();
-   f.read_to_string(&mut contents)
-      .expect("something went wrong reading the file");
-
-   return contents;
-}
-
 
 fn a(polymer: &String) {
    println!("Result A: {}", compress_polymer(polymer));

@@ -1,10 +1,10 @@
 [package]
-name = "main"
+name = "5"
 version = "0.1.0"
-authors = ["Dylan Owen <dyltotheo@gmail.com>"]
+authors = ["Dylan"]
 
 [dependencies]
+lib = { path = "../lib" }
 
 [[bin]]
-name = "main"
-path = "main.rs"
+name = "5"

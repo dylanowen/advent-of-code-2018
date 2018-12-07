@@ -1,11 +1,12 @@
+extern crate chrono;
+extern crate regex;
+
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
-use regex::Regex;
-use chrono::prelude::*;
-use std::collections::HashMap;
 
-extern crate regex;
-extern crate chrono;
+use chrono::prelude::*;
+use regex::Regex;
 
 struct Row(DateTime<Utc>, String);
 
