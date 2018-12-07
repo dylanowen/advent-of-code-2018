@@ -1,5 +1,5 @@
 [package]
-name = "6"
+name = "7"
 version = "0.1.0"
 authors = ["Dylan"]
 
@@ -8,4 +8,4 @@ lib = { path = "../lib" }
 regex = "1"
 
 [[bin]]
-name = "6"
+name = "7"
