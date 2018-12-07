@@ -4,16 +4,16 @@ extern crate regex;
 use regex::Regex;
 
 use lib::*;
-use lib::grid::Cord;
-use lib::grid::Grid;
+use lib::coordinates::Loci;
+use lib::coordinates::Grid;
 
 fn main() {
     run_day("6", &|contents, is_sample| {
         let re: Regex = Regex::new(r"(\d+), (\d+)").unwrap();
 
-        let mut min = Cord::max_value();
-        let mut max = Cord::new(0, 0);
-        let locations: Vec<Cord> = contents.lines()
+        let mut min = Loci::max_value();
+        let mut max = Loci::new(0, 0);
+        let locations: Vec<Loci> = contents.lines()
             .map(|row| {
                 let parsed_row = re.captures(row).unwrap();
 
@@ -34,7 +34,7 @@ fn main() {
                     max = max.with_y(y);
                 }
 
-                return Cord::new(x, y);
+                return Loci::new(x, y);
             })
             .collect();
 
@@ -55,62 +55,21 @@ fn main() {
     });
 }
 
-fn b(locations: &Vec<Cord>, min: &Cord, max: &Cord, region_range: usize) {
-    let mut region_grid: grid::Grid<usize> = Grid::new_cord_offset(
-        0,
-        &max.sub_cord(min),
-        min,
-    );
-
-    'main: for (cord, _) in region_grid.enumerate() {
-        let mut total_distance = 0;
-        for location in locations {
-            total_distance += location.distance(&cord);
-            if total_distance > region_range {
-                // we hit our limit so break out
-                continue 'main;
-            }
-        }
-
-        // if we get here we know we're in a region
-        region_grid.set(&cord, 1);
-    }
-
-//    for y in 0..height {
-//        for x in 0..width {
-//            match grid[x][y] {
-//                true => print!("#"),
-//                _ => print!("."),
-//            }
-//        }
-//        println!()
-//    }
-
-    // count up the size of our region
-
-
-    let region_size = region_grid.iter()
-        .fold(0, |sum, cell| -> usize {
-            sum + cell
-        });
-
-    println!("Result B: {}", region_size);
-}
-
-fn a(locations: &Vec<Cord>, min: &Cord, max: &Cord) {
-    let mut manhattan_grid: grid::Grid<Option<&Cord>> = Grid::new_cord_offset(
+fn a(locations: &Vec<Loci>, min: &Loci, max: &Loci) {
+    let mut manhattan_grid: coordinates::Grid<Option<&Loci>> = Grid::new_cord_offset(
         None,
         &max.sub_cord(min),
         min,
     );
 
+    // for each coordinate in the graph find the closest "location"
     for cord in manhattan_grid.cords() {
         manhattan_grid.set(&cord, find_closest_location(&cord, locations))
     }
 
     // trim infinity locations
     let mut finite_locations = locations.iter()
-        .map(|location| -> &Cord { &location })
+        .map(|location| -> &Loci { &location })
         .collect();
     for x in 0..manhattan_grid.width {
         prune_infinite(manhattan_grid[x][0isize], &mut finite_locations);
@@ -122,27 +81,27 @@ fn a(locations: &Vec<Cord>, min: &Cord, max: &Cord) {
     }
 
     // debug
-//    for y in 0..height {
-//        for x in 0..width {
-//            match grid[x][y] {
-//                Some(_) => print!("#"),
-//                _ => print!("."),
-//            }
-//        }
-//        println!()
-//    }
-
-//    for finite_location in finite_locations.iter() {
-//        println!("{:?}", finite_location);
-//    }
+    //for y in 0..height {
+    //    for x in 0..width {
+    //        match grid[x][y] {
+    //            Some(_) => print!("#"),
+    //            _ => print!("."),
+    //        }
+    //    }
+    //    println!()
+    //}
+    //
+    //for finite_location in finite_locations.iter() {
+    //    println!("{:?}", finite_location);
+    //}
 
     let mut max_area = 0;
     for location in finite_locations {
         let mut area = 0;
 
-        for maybe_cord in manhattan_grid.iter() {
-            match maybe_cord {
-                Some(cord) => if *cord == location {
+        for maybe_loci in manhattan_grid.iter() {
+            match maybe_loci {
+                Some(loci) => if *loci == location {
                     area += 1;
                 }
                 _ => {}
@@ -157,23 +116,64 @@ fn a(locations: &Vec<Cord>, min: &Cord, max: &Cord) {
     println!("Result A: {}", max_area);
 }
 
-fn prune_infinite(infinite_location: Option<&Cord>, finite_locations: &mut Vec<&Cord>) {
+fn prune_infinite(infinite_location: Option<&Loci>, finite_locations: &mut Vec<&Loci>) {
     match infinite_location {
         Some(infinite) => {
             finite_locations.iter()
-                .position(|cord| *cord == infinite)
+                .position(|loci| *loci == infinite)
                 .map(|position| finite_locations.remove(position));
         }
         _ => {}
     }
 }
 
-fn find_closest_location<'a>(current_cord: &Cord, locations: &'a Vec<Cord>) -> Option<&'a Cord> {
+
+fn b(locations: &Vec<Loci>, min: &Loci, max: &Loci, region_range: usize) {
+    let mut region_grid: coordinates::Grid<usize> = Grid::new_loci_offset(
+        0,
+        &max.sub_loci(min),
+        min,
+    );
+
+    'main: for (loci, _) in region_grid.enumerate() {
+        let mut total_distance = 0;
+        for location in locations {
+            total_distance += location.distance(&loci);
+            if total_distance > region_range {
+                // we hit our limit so break out
+                continue 'main;
+            }
+        }
+
+        // if we get here we know we're in a region
+        region_grid.set(&loci, 1);
+    }
+
+    //for y in 0..height {
+    //    for x in 0..width {
+    //        match grid[x][y] {
+    //            true => print!("#"),
+    //            _ => print!("."),
+    //        }
+    //    }
+    //    println!()
+    //}
+
+    // count up the size of our region
+    let region_size = region_grid.iter()
+        .fold(0, |sum, cell| -> usize {
+            sum + cell
+        });
+
+    println!("Result B: {}", region_size);
+}
+
+fn find_closest_location<'a>(current_loci: &Loci, locations: &'a Vec<Loci>) -> Option<&'a Loci> {
     let mut min_distance = usize::max_value();
     let mut closest = None;
     let mut dup = false;
     for location in locations {
-        let distance = current_cord.distance(location);
+        let distance = current_loci.distance(location);
         //println!("{}", distance);
 
         if distance < min_distance {

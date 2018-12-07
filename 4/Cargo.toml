@@ -4,9 +4,9 @@ version = "0.1.0"
 authors = ["Dylan"]
 
 [dependencies]
+lib = { path = "../lib" }
 regex = "1"
 chrono = "0.4"
 
 [[bin]]
 name = "4"
-path = "main.rs"

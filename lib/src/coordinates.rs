@@ -12,11 +12,11 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T> {
-    pub fn get(&self, cord: &Cord) -> &T {
+    pub fn get(&self, cord: &Loci) -> &T {
         &self[cord.x][cord.y]
     }
 
-    pub fn set(&mut self, cord: &Cord, value: T) {
+    pub fn set(&mut self, cord: &Loci, value: T) {
         self[cord.x][cord.y] = value
     }
 
@@ -30,7 +30,7 @@ impl<T: Clone> Grid<T> {
         Grid::new_offset(default, width, height, 0, 0)
     }
 
-    pub fn new_cord_offset(default: T, dim: &Cord, offset: &Cord) -> Grid<T> {
+    pub fn new_cord_offset(default: T, dim: &Loci, offset: &Loci) -> Grid<T> {
         Grid::new_offset(default, dim.x as usize, dim.y as usize, offset.x, offset.y)
     }
 
@@ -49,7 +49,7 @@ impl<T: Clone> Grid<T> {
         }
     }
 
-    pub fn cords(&self) -> GridCords {
+    pub fn locis(&self) -> GridCords {
         GridCords::new(self)
     }
 
@@ -71,23 +71,23 @@ impl<'a, T> IntoIterator for &'a Grid<T> {
     fn into_iter(self) -> Self::IntoIter {
         GridIterator {
             grid: &self,
-            cords: GridCords::new(self),
+            locis: GridCords::new(self),
         }
     }
 }
 
 pub struct GridIterator<'a, T> {
     grid: &'a Grid<T>,
-    cords: GridCords,
+    locis: GridCords,
 }
 
 impl<'a, T> Iterator for GridIterator<'a, T> {
     type Item = &'a T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.cords.next()
-            .map(|cord| {
-                self.grid.get(&cord)
+        self.locis.next()
+            .map(|loci| {
+                self.grid.get(&loci)
             })
     }
 }
@@ -97,12 +97,12 @@ pub struct GridEnumerator<'a, T> {
 }
 
 impl<'a, T> Iterator for GridEnumerator<'a, T> {
-    type Item = (Cord, &'a T);
+    type Item = (Loci, &'a T);
 
     fn next(&mut self) -> Option<Self::Item> {
-        let cord = self.iter.cords.cord();
+        let loci = self.iter.locis.loci();
 
-        self.iter.next().map(|result| (cord.unwrap(), result))
+        self.iter.next().map(|result| (loci.unwrap(), result))
     }
 }
 
@@ -125,9 +125,9 @@ impl GridCords {
         }
     }
 
-    fn cord(&self) -> Option<Cord> {
+    fn loci(&self) -> Option<Loci> {
         if self.x < self.width && self.y < self.height {
-            Some(Cord::new(self.x, self.y))
+            Some(Loci::new(self.x, self.y))
         } else {
             None
         }
@@ -135,18 +135,18 @@ impl GridCords {
 }
 
 impl Iterator for GridCords {
-    type Item = Cord;
+    type Item = Loci;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.cord()
-            .map(|cord| {
+        self.loci()
+            .map(|loci| {
                 self.y += 1;
                 if self.y > self.height {
                     self.x += 1;
                     self.y = self.y_offset;
                 }
 
-                cord
+                loci
             })
     }
 }
@@ -234,18 +234,18 @@ impl<T: Clone> Clone for GridColumn<T> {
 }
 
 #[derive(Debug)]
-pub struct Cord {
+pub struct Loci {
     x: isize,
     y: isize,
 }
 
-impl Cord {
-    pub fn max_value() -> Cord {
-        Cord::new(isize::max_value(), isize::max_value())
+impl Loci {
+    pub fn max_value() -> Loci {
+        Loci::new(isize::max_value(), isize::max_value())
     }
 
-    pub fn new(x: isize, y: isize) -> Cord {
-        Cord {
+    pub fn new(x: isize, y: isize) -> Loci {
+        Loci {
             x,
             y,
         }
@@ -262,72 +262,72 @@ impl Cord {
     }
 
     #[inline]
-    pub fn with_x(&self, x: isize) -> Cord {
-        Cord::new(x, self.y)
+    pub fn with_x(&self, x: isize) -> Loci {
+        Loci::new(x, self.y)
     }
 
     #[inline]
-    pub fn with_y(&self, y: isize) -> Cord {
-        Cord::new(self.x, y)
+    pub fn with_y(&self, y: isize) -> Loci {
+        Loci::new(self.x, y)
     }
 
-    pub fn distance(&self, other: &Cord) -> usize {
+    pub fn distance(&self, other: &Loci) -> usize {
         ((self.x() - other.x()).abs() +
             (self.y() - other.y()).abs()) as usize
     }
 
     #[inline]
-    pub fn add(&self, x: isize, y: isize) -> Cord {
-        Cord::new(self.x + x, self.y + y)
+    pub fn add(&self, x: isize, y: isize) -> Loci {
+        Loci::new(self.x + x, self.y + y)
     }
 
     #[inline]
-    pub fn add_cord(&self, other: &Cord) -> Cord {
+    pub fn add_loci(&self, other: &Loci) -> Loci {
         self.add(other.x, other.y)
     }
 
     #[inline]
-    pub fn add_x(&self, inc: isize) -> Cord {
+    pub fn add_x(&self, inc: isize) -> Loci {
         self.add(inc, 0)
     }
 
     #[inline]
-    pub fn add_y(&self, inc: isize) -> Cord {
+    pub fn add_y(&self, inc: isize) -> Loci {
         self.add(0, inc)
     }
 
     #[inline]
-    pub fn sub(&self, x: isize, y: isize) -> Cord {
-        Cord::new(self.x - x, self.y - y)
+    pub fn sub(&self, x: isize, y: isize) -> Loci {
+        Loci::new(self.x - x, self.y - y)
     }
 
     #[inline]
-    pub fn sub_cord(&self, other: &Cord) -> Cord {
+    pub fn sub_loci(&self, other: &Loci) -> Loci {
         self.sub(other.x, other.y)
     }
 
     #[inline]
-    pub fn sub_x(&self, inc: isize) -> Cord {
+    pub fn sub_x(&self, inc: isize) -> Loci {
         self.sub(inc, 0)
     }
 
     #[inline]
-    pub fn sub_y(&self, inc: isize) -> Cord {
+    pub fn sub_y(&self, inc: isize) -> Loci {
         self.sub(0, inc)
     }
 }
 
-impl Clone for Cord {
+impl Clone for Loci {
     fn clone(&self) -> Self {
-        Cord {
+        Loci {
             x: self.x,
             y: self.y,
         }
     }
 }
 
-impl PartialEq for Cord {
-    fn eq(&self, other: &Cord) -> bool {
+impl PartialEq for Loci {
+    fn eq(&self, other: &Loci) -> bool {
         self.x == other.x && self.y == other.y
     }
 }
