@@ -1,5 +1,6 @@
 use std::ops::Index;
 use std::ops::IndexMut;
+use std::ops::Range;
 
 #[derive(Debug)]
 pub struct Grid<T> {
@@ -12,12 +13,36 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T> {
-   pub fn get(&self, cord: &Loci) -> &T {
-      &self[cord.x][cord.y]
+   pub fn get(&self, loci: &Loci) -> &T {
+      &self[loci.x][loci.y]
    }
 
-   pub fn set(&mut self, cord: &Loci, value: T) {
-      self[cord.x][cord.y] = value
+   pub fn set(&mut self, loci: &Loci, value: T) {
+      self[loci.x][loci.y] = value
+   }
+
+   pub fn x_min(&self) -> isize {
+      self.x_offset
+   }
+
+   pub fn x_max(&self) -> isize {
+      self.x_offset + (self.width as isize)
+   }
+
+   pub fn x_range(&self) -> Range<isize> {
+      self.x_min()..self.x_max()
+   }
+
+   pub fn y_min(&self) -> isize {
+      self.y_offset
+   }
+
+   pub fn y_max(&self) -> isize {
+      self.y_offset + (self.height as isize)
+   }
+
+   pub fn y_range(&self) -> Range<isize> {
+      self.x_min()..self.x_max()
    }
 
    fn raw_x(&self, x: isize) -> usize {
@@ -30,7 +55,7 @@ impl<T: Clone> Grid<T> {
       Grid::new_offset(default, width, height, 0, 0)
    }
 
-   pub fn new_cord_offset(default: T, dim: &Loci, offset: &Loci) -> Grid<T> {
+   pub fn new_loci_offset(default: T, dim: &Loci, offset: &Loci) -> Grid<T> {
       Grid::new_offset(default, dim.x as usize, dim.y as usize, offset.x, offset.y)
    }
 
@@ -49,8 +74,8 @@ impl<T: Clone> Grid<T> {
       }
    }
 
-   pub fn locis(&self) -> GridCords {
-      GridCords::new(self)
+   pub fn locis(&self) -> GridLocis {
+      GridLocis::new(self)
    }
 
    pub fn iter(&self) -> GridIterator<T> {
@@ -71,14 +96,14 @@ impl<'a, T> IntoIterator for &'a Grid<T> {
    fn into_iter(self) -> Self::IntoIter {
       GridIterator {
          grid: &self,
-         locis: GridCords::new(self),
+         locis: GridLocis::new(self),
       }
    }
 }
 
 pub struct GridIterator<'a, T> {
    grid: &'a Grid<T>,
-   locis: GridCords,
+   locis: GridLocis,
 }
 
 impl<'a, T> Iterator for GridIterator<'a, T> {
@@ -106,7 +131,7 @@ impl<'a, T> Iterator for GridEnumerator<'a, T> {
    }
 }
 
-pub struct GridCords {
+pub struct GridLocis {
    x: isize,
    y: isize,
    width: isize,
@@ -114,9 +139,9 @@ pub struct GridCords {
    y_offset: isize,
 }
 
-impl GridCords {
-   fn new<T>(grid: &Grid<T>) -> GridCords {
-      GridCords {
+impl GridLocis {
+   fn new<T>(grid: &Grid<T>) -> GridLocis {
+      GridLocis {
          x: grid.x_offset,
          y: grid.y_offset,
          width: grid.width as isize,
@@ -134,7 +159,7 @@ impl GridCords {
    }
 }
 
-impl Iterator for GridCords {
+impl Iterator for GridLocis {
    type Item = Loci;
 
    fn next(&mut self) -> Option<Self::Item> {

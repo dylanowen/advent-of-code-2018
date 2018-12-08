@@ -56,28 +56,29 @@ fn main() {
 }
 
 fn a(locations: &Vec<Loci>, min: &Loci, max: &Loci) {
-   let mut manhattan_grid: coordinates::Grid<Option<&Loci>> = Grid::new_cord_offset(
+   let mut manhattan_grid: coordinates::Grid<Option<&Loci>> = Grid::new_loci_offset(
       None,
-      &max.sub_cord(min),
+      &max.sub_loci(min),
       min,
    );
 
    // for each coordinate in the graph find the closest "location"
-   for cord in manhattan_grid.cords() {
-      manhattan_grid.set(&cord, find_closest_location(&cord, locations))
+   for loci in manhattan_grid.locis() {
+      manhattan_grid.set(&loci, find_closest_location(&loci, locations))
    }
 
    // trim infinity locations
    let mut finite_locations = locations.iter()
       .map(|location| -> &Loci { &location })
       .collect();
-   for x in 0..manhattan_grid.width {
-      prune_infinite(manhattan_grid[x][0isize], &mut finite_locations);
-      prune_infinite(manhattan_grid[x][manhattan_grid.height - 1], &mut finite_locations);
+
+   for x in manhattan_grid.x_range() {
+      prune_infinite(manhattan_grid[x][manhattan_grid.y_min()], &mut finite_locations);
+      prune_infinite(manhattan_grid[x][manhattan_grid.y_max() - 1], &mut finite_locations);
    }
-   for y in 1..(manhattan_grid.height - 1) {
-      prune_infinite(manhattan_grid[0isize][y], &mut finite_locations);
-      prune_infinite(manhattan_grid[manhattan_grid.width - 1][y], &mut finite_locations);
+   for y in manhattan_grid.y_range() {
+      prune_infinite(manhattan_grid[manhattan_grid.x_min()][y], &mut finite_locations);
+      prune_infinite(manhattan_grid[manhattan_grid.x_max() - 1][y], &mut finite_locations);
    }
 
    // debug
@@ -135,7 +136,7 @@ fn b(locations: &Vec<Loci>, min: &Loci, max: &Loci, region_range: usize) {
       min,
    );
 
-   'main: for (loci, _) in region_grid.enumerate() {
+   'main: for loci in region_grid.locis() {
       let mut total_distance = 0;
       for location in locations {
          total_distance += location.distance(&loci);
