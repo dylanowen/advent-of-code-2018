@@ -1,8 +1,5 @@
 extern crate lib;
 
-use std::collections::HashMap;
-use std::iter::FromIterator;
-
 use lib::*;
 
 struct Node {
