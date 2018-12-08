@@ -11,7 +11,7 @@ struct Claim<'a> {
 }
 
 fn main() {
-   run_input("3", "input.txt", &|contents, _is_sample| {
+   run_input("3", "input.txt", &|contents| {
       let mut max_width: usize = 0;
       let mut max_height: usize = 0;
 

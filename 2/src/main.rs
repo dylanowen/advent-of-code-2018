@@ -4,7 +4,7 @@ use lib::*;
 use std::collections::BTreeSet;
 
 fn main() {
-   run_input("2", "input.txt", &|contents, _is_sample| {
+   run_input("2", "input.txt", &|contents| {
       let ids = contents.split_whitespace()
          .collect();
 

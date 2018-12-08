@@ -7,21 +7,21 @@ pub fn run_day<R>(day: &str, runner: &R) where
    R: Fn(&String, bool) {
    run_day_sample(day, runner);
 
-   run_input(day, "input.txt", runner);
+   run_input(day, "input.txt", &|contents| runner(contents, false));
 }
 
 // for when we're not ready to run the full thing
 pub fn run_day_sample<R>(day: &str, runner: &R) where
    R: Fn(&String, bool) {
-   run_input(day, "sample_input.txt", runner);
+   run_input(day, "sample_input.txt", &|contents| runner(contents, true));
 }
 
 pub fn run_input<R>(day: &str, file_name: &str, runner: &R) where
-   R: Fn(&String, bool) {
+   R: Fn(&String) {
    let input = parse_input(day, file_name);
 
    println!("Running: {}", file_name);
-   runner(&input, false);
+   runner(&input);
 }
 
 pub fn parse_input(day: &str, file_name: &str) -> String {
