@@ -5,6 +5,7 @@ authors = ["Dylan"]
 
 [dependencies]
 lib = { path = "../lib" }
+regex = "1"
 
 [[bin]]
 name = "9"
