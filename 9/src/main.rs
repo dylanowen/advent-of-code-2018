@@ -1,12 +1,16 @@
 extern crate lib;
 extern crate regex;
 
+extern crate doubly;
+
+use doubly::DoublyLinkedList;
+
 use regex::Regex;
 
 use lib::*;
 
 fn main() {
-   run_day("9", &|contents, is_sample| {
+   run_day("9", &|contents, _is_sample| {
       let re: Regex = Regex::new(r"(\d+) players; last marble is worth (\d+) points").unwrap();
 
       let parsed = re.captures(contents).unwrap();
@@ -15,13 +19,9 @@ fn main() {
       let max_marble = parsed[2].parse::<usize>().unwrap();
 
       a(players, max_marble);
-
-      if !is_sample {
-         b(players, max_marble);
-      }
+      b(players, max_marble);
    });
 }
-
 
 fn a(players: usize, max_marble: usize) {
    let high_score = play_game(players, max_marble);
@@ -29,23 +29,7 @@ fn a(players: usize, max_marble: usize) {
 }
 
 fn b(players: usize, max_marble: usize) {
-   let mut last_high_score = 0;
-   let mut last_max_marble = 0;
-   for marble in 0..=max_marble {
-      let high_score = play_game(players, marble);
-
-      if high_score != last_high_score {
-         let diff_score = high_score - last_high_score;
-         let diff_marble = marble - last_max_marble;
-
-         println!("{} {}", diff_marble, diff_score);
-
-         last_high_score = high_score;
-         last_max_marble = marble;
-      }
-   }
-
-   //println!("{}", play_game(players, max_marble * 100));
+   println!("Result B: {}", play_game(players, max_marble * 100));
 }
 
 fn play_game(players: usize, max_marble: usize) -> usize {
@@ -53,12 +37,11 @@ fn play_game(players: usize, max_marble: usize) -> usize {
    // play the first 2 plays for simplicity
    let mut current_player = 2;
    let mut current_index = 1;
-   let mut circle = vec![0, 1];
-   for marble in 2..=max_marble {
-//      if (marble % (max_marble / 100)) == 0 {
-//         println!("progress: {}", marble);
-//      }
+   let mut circle: DoublyLinkedList<usize> = DoublyLinkedList::new();
+   circle.push_back(0);
+   circle.push_back(1);
 
+   for marble in 2..=max_marble {
       if (marble % 23) == 0 {
          // special case
          scores[current_player] += marble;
@@ -88,21 +71,6 @@ fn play_game(players: usize, max_marble: usize) -> usize {
          current_player = 1;
       }
    }
-
-//   let mut high_scores: Vec<usize> = scores.iter()
-//      .filter_map(|v| {
-//         if *v > 0 {
-//            Some(*v)
-//         }
-//         else {
-//            None
-//         }
-//      })
-//      .collect();
-//
-//   high_scores.sort();
-//
-//   println!("{:?}", high_scores);
 
    return scores.iter()
       .fold(0, |max, score| {
