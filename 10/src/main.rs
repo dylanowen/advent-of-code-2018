@@ -7,7 +7,6 @@ use lib::*;
 use lib::coordinates::Grid;
 use lib::coordinates::Loci;
 use lib::coordinates::OffsetLociX;
-use lib::coordinates::OffsetLociY;
 
 struct Point {
    loci: Loci,
@@ -64,16 +63,16 @@ fn ab(original_points: &Vec<Point>, is_sample: bool) {
 
       grid = Grid::new_loci_offset(
          0,
-         &Loci::new(40, 60),
-         &Loci::new(-20, -30),
+         &Loci::new(30, 15),
+         &Loci::new(-10, -5),
       );
    } else {
       render_second = 10645;
 
       grid = Grid::new_loci_offset(
          0,
-         &Loci::new(100, 100),
-         &Loci::new(100, 150),
+         &Loci::new(70, 20),
+         &Loci::new(180, 135),
       );
    }
 
@@ -100,7 +99,7 @@ fn ab(original_points: &Vec<Point>, is_sample: bool) {
                print!(".")
             }
 
-            if loci.y() == (grid.y_max() - 1) {
+            if loci.x() == (grid.x_max() - 1) {
                println!();
             }
          }

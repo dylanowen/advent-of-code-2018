@@ -66,7 +66,7 @@ fn a(locations: &Vec<Loci>, min: &Loci, max: &Loci) {
 
    // for each coordinate in the graph find the closest "location"
    for loci in manhattan_grid.locis() {
-      manhattan_grid.set(&loci, find_closest_location(&loci, locations))
+      manhattan_grid.set_loci(&loci, find_closest_location(&loci, locations))
    }
 
    // trim infinity locations
@@ -75,12 +75,12 @@ fn a(locations: &Vec<Loci>, min: &Loci, max: &Loci) {
       .collect();
 
    for x in manhattan_grid.x_range() {
-      prune_infinite(manhattan_grid[x][manhattan_grid.y_min()], &mut finite_locations);
-      prune_infinite(manhattan_grid[x][manhattan_grid.y_max() - 1], &mut finite_locations);
+      prune_infinite(*manhattan_grid.get(x, manhattan_grid.y_min()), &mut finite_locations);
+      prune_infinite(*manhattan_grid.get(x, manhattan_grid.y_max() - 1), &mut finite_locations);
    }
    for y in manhattan_grid.y_range() {
-      prune_infinite(manhattan_grid[manhattan_grid.x_min()][y], &mut finite_locations);
-      prune_infinite(manhattan_grid[manhattan_grid.x_max() - 1][y], &mut finite_locations);
+      prune_infinite(*manhattan_grid.get(manhattan_grid.x_min(), y), &mut finite_locations);
+      prune_infinite(*manhattan_grid.get(manhattan_grid.x_max() - 1, y), &mut finite_locations);
    }
 
    // debug
@@ -150,7 +150,7 @@ fn b(locations: &Vec<Loci>, min: &Loci, max: &Loci, region_range: usize) {
       }
 
       // if we get here we know we're in a region
-      region_grid.set(&loci, 1);
+      region_grid.set_loci(&loci, 1);
    }
 
    //for y in 0..height {
