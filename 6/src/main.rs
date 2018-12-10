@@ -6,6 +6,8 @@ use regex::Regex;
 use lib::*;
 use lib::coordinates::Grid;
 use lib::coordinates::Loci;
+use lib::coordinates::OffsetLociX;
+use lib::coordinates::OffsetLociY;
 
 fn main() {
    run_day("6", &|contents, is_sample| {
@@ -82,16 +84,17 @@ fn a(locations: &Vec<Loci>, min: &Loci, max: &Loci) {
    }
 
    // debug
-   //for y in 0..height {
-   //    for x in 0..width {
-   //        match grid[x][y] {
-   //            Some(_) => print!("#"),
-   //            _ => print!("."),
-   //        }
-   //    }
-   //    println!()
-   //}
+   //for loci in manhattan_grid.locis() {
+   //   match manhattan_grid.get(&loci) {
+   //      Some(_) => print!("#"),
+   //      _ => print!("."),
+   //   }
    //
+   //   if loci.y() == manhattan_grid.y_min() {
+   //      println!();
+   //   }
+   //}
+
    //for finite_location in finite_locations.iter() {
    //    println!("{:?}", finite_location);
    //}

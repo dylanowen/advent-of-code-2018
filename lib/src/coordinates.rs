@@ -4,12 +4,58 @@ use std::ops::Range;
 
 #[derive(Debug)]
 pub struct Grid<T> {
-   pub width: usize,
-   pub height: usize,
+   width: usize,
+   height: usize,
    x_offset: isize,
    y_offset: isize,
 
    grid: Vec<GridColumn<T>>,
+}
+
+pub trait OffsetLociX {
+   fn width(&self) -> usize;
+
+   fn x_min(&self) -> isize;
+
+   // exclusive max
+   fn x_max(&self) -> isize {
+      self.x_min() + (self.width() as isize)
+   }
+
+   fn raw_x(&self, x: isize) -> usize {
+      (x - self.x_min()) as usize
+   }
+
+   fn real_x(&self, raw_x: usize) -> isize {
+      (raw_x as isize) + self.x_min()
+   }
+
+   fn x_range(&self) -> Range<isize> {
+      self.x_min()..self.x_max()
+   }
+}
+
+pub trait OffsetLociY {
+   fn height(&self) -> usize;
+
+   fn y_min(&self) -> isize;
+
+   // exclusive max
+   fn y_max(&self) -> isize {
+      self.y_min() + (self.height() as isize)
+   }
+
+   fn raw_y(&self, y: isize) -> usize {
+      (y - self.y_min()) as usize
+   }
+
+   fn real_y(&self, raw_y: usize) -> isize {
+      (raw_y as isize) + self.y_min()
+   }
+
+   fn y_range(&self) -> Range<isize> {
+      self.y_min()..self.y_max()
+   }
 }
 
 impl<T> Grid<T> {
@@ -19,34 +65,6 @@ impl<T> Grid<T> {
 
    pub fn set(&mut self, loci: &Loci, value: T) {
       self[loci.x][loci.y] = value
-   }
-
-   pub fn x_min(&self) -> isize {
-      self.x_offset
-   }
-
-   pub fn x_max(&self) -> isize {
-      self.x_offset + (self.width as isize)
-   }
-
-   pub fn x_range(&self) -> Range<isize> {
-      self.x_min()..self.x_max()
-   }
-
-   pub fn y_min(&self) -> isize {
-      self.y_offset
-   }
-
-   pub fn y_max(&self) -> isize {
-      self.y_offset + (self.height as isize)
-   }
-
-   pub fn y_range(&self) -> Range<isize> {
-      self.x_min()..self.x_max()
-   }
-
-   fn raw_x(&self, x: isize) -> usize {
-      (x - self.x_offset) as usize
    }
 }
 
@@ -86,6 +104,56 @@ impl<T: Clone> Grid<T> {
       GridEnumerator {
          iter: self.into_iter()
       }
+   }
+}
+
+impl<T> OffsetLociX for Grid<T> {
+   fn width(&self) -> usize {
+      self.width
+   }
+
+   fn x_min(&self) -> isize {
+      self.x_offset
+   }
+}
+
+impl<T> OffsetLociY for Grid<T> {
+   fn height(&self) -> usize {
+      self.height
+   }
+
+   fn y_min(&self) -> isize {
+      self.y_offset
+   }
+}
+
+impl<T> Index<isize> for Grid<T> {
+   type Output = GridColumn<T>;
+
+   fn index(&self, index: isize) -> &Self::Output {
+      &self.grid[self.raw_x(index)]
+   }
+}
+
+impl<T> Index<usize> for Grid<T> {
+   type Output = GridColumn<T>;
+
+   fn index(&self, index: usize) -> &Self::Output {
+      &self[index as isize]
+   }
+}
+
+impl<T> IndexMut<isize> for Grid<T> {
+   fn index_mut(&mut self, index: isize) -> &mut GridColumn<T> {
+      let raw_x = self.raw_x(index);
+
+      &mut self.grid[raw_x]
+   }
+}
+
+impl<T> IndexMut<usize> for Grid<T> {
+   fn index_mut(&mut self, index: usize) -> &mut GridColumn<T> {
+      &mut self[index as isize]
    }
 }
 
@@ -131,91 +199,19 @@ impl<'a, T> Iterator for GridEnumerator<'a, T> {
    }
 }
 
-pub struct GridLocis {
-   x: isize,
-   y: isize,
-   width: isize,
-   height: isize,
-   y_offset: isize,
-}
-
-impl GridLocis {
-   fn new<T>(grid: &Grid<T>) -> GridLocis {
-      GridLocis {
-         x: grid.x_offset,
-         y: grid.y_offset,
-         width: grid.width as isize,
-         height: grid.height as isize,
-         y_offset: grid.y_offset,
-      }
-   }
-
-   fn loci(&self) -> Option<Loci> {
-      if self.x < self.width && self.y < self.height {
-         Some(Loci::new(self.x, self.y))
-      } else {
-         None
-      }
-   }
-}
-
-impl Iterator for GridLocis {
-   type Item = Loci;
-
-   fn next(&mut self) -> Option<Self::Item> {
-      self.loci()
-         .map(|loci| {
-            self.y += 1;
-            if self.y > self.height {
-               self.x += 1;
-               self.y = self.y_offset;
-            }
-
-            loci
-         })
-   }
-}
-
-
-impl<T> Index<isize> for Grid<T> {
-   type Output = GridColumn<T>;
-
-   fn index(&self, index: isize) -> &Self::Output {
-      &self.grid[self.raw_x(index)]
-   }
-}
-
-impl<T> Index<usize> for Grid<T> {
-   type Output = GridColumn<T>;
-
-   fn index(&self, index: usize) -> &Self::Output {
-      &self[index as isize]
-   }
-}
-
-impl<T> IndexMut<isize> for Grid<T> {
-   fn index_mut(&mut self, index: isize) -> &mut GridColumn<T> {
-      let raw_x = self.raw_x(index);
-
-      &mut self.grid[raw_x]
-   }
-}
-
-impl<T> IndexMut<usize> for Grid<T> {
-   fn index_mut(&mut self, index: usize) -> &mut GridColumn<T> {
-      &mut self[index as isize]
-   }
-}
-
 #[derive(Debug)]
 pub struct GridColumn<T> {
    y_offset: isize,
    column: Vec<T>,
 }
 
-impl<T> GridColumn<T> {
-   fn raw_y(&self, y: isize) -> usize {
-      (y - self.y_offset) as usize
+impl<T> OffsetLociY for GridColumn<T> {
+   fn height(&self) -> usize {
+      self.column.len()
+   }
+
+   fn y_min(&self) -> isize {
+      self.y_offset
    }
 }
 
@@ -255,6 +251,74 @@ impl<T: Clone> Clone for GridColumn<T> {
          y_offset: self.y_offset,
          column: self.column.to_vec(),
       }
+   }
+}
+
+#[derive(Debug)]
+pub struct GridLocis {
+   x: isize,
+   y: isize,
+   width: usize,
+   height: usize,
+   x_offset: isize,
+   y_offset: isize,
+}
+
+impl GridLocis {
+   fn new<T>(grid: &Grid<T>) -> GridLocis {
+      return GridLocis {
+         x: grid.x_offset,
+         y: grid.y_offset,
+         width: grid.width,
+         height: grid.height,
+         x_offset: grid.x_offset,
+         y_offset: grid.y_offset,
+      };
+   }
+
+   fn loci(&self) -> Option<Loci> {
+      if self.x < self.x_max() && self.y < self.y_max() {
+         Some(Loci::new(self.x, self.y))
+      } else {
+         None
+      }
+   }
+}
+
+impl OffsetLociX for GridLocis {
+   fn width(&self) -> usize {
+      self.width
+   }
+
+   fn x_min(&self) -> isize {
+      self.x_offset
+   }
+}
+
+impl OffsetLociY for GridLocis {
+   fn height(&self) -> usize {
+      self.height
+   }
+
+   fn y_min(&self) -> isize {
+      self.y_offset
+   }
+}
+
+impl Iterator for GridLocis {
+   type Item = Loci;
+
+   fn next(&mut self) -> Option<Self::Item> {
+      self.loci()
+         .map(|loci| {
+            self.y += 1;
+            if self.y >= self.x_max() {
+               self.x += 1;
+               self.y = self.y_min();
+            }
+
+            loci
+         })
    }
 }
 
