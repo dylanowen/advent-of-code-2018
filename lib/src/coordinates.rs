@@ -67,6 +67,13 @@ impl<T> Grid<T> {
       &self.grid[self.raw_y(y)][self.raw_x(x)]
    }
 
+   pub fn get_mut(&mut self, x: isize, y: isize) -> &mut T {
+      let raw_x = self.raw_x(x);
+      let raw_y = self.raw_y(y);
+
+      &mut self.grid[raw_y][raw_x]
+   }
+
    pub fn set_loci(&mut self, loci: &Loci, value: T) {
       self.set(loci.x, loci.y, value);
    }
@@ -99,7 +106,7 @@ impl<T: Clone> Grid<T> {
    }
 
    pub fn locis(&self) -> GridLocis {
-      GridLocis::new(self)
+      GridLocis::for_grid(self)
    }
 
    pub fn iter(&self) -> GridIterator<T> {
@@ -140,7 +147,7 @@ impl<'a, T> IntoIterator for &'a Grid<T> {
    fn into_iter(self) -> Self::IntoIter {
       GridIterator {
          grid: &self,
-         locis: GridLocis::new(self),
+         locis: GridLocis::for_grid(self),
       }
    }
 }
@@ -186,14 +193,18 @@ pub struct GridLocis {
 }
 
 impl GridLocis {
-   fn new<T>(grid: &Grid<T>) -> GridLocis {
+   fn for_grid<T>(grid: &Grid<T>) -> GridLocis {
+      GridLocis::new(grid.width, grid.height, grid.x_offset, grid.y_offset)
+   }
+
+   pub fn new(width: usize, height: usize, x_offset: isize, y_offset: isize) -> GridLocis {
       return GridLocis {
-         x: grid.x_offset,
-         y: grid.y_offset,
-         width: grid.width,
-         height: grid.height,
-         x_offset: grid.x_offset,
-         y_offset: grid.y_offset,
+         x: x_offset,
+         y: y_offset,
+         width,
+         height,
+         x_offset,
+         y_offset,
       };
    }
 
