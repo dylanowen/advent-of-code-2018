@@ -1,5 +1,3 @@
-extern crate lib;
-
 use std::collections::HashMap;
 use lib::*;
 use lib::coordinates::Grid;

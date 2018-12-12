@@ -1,6 +1,3 @@
-extern crate lib;
-extern crate regex;
-
 use regex::Regex;
 
 use lib::*;
@@ -42,8 +39,7 @@ fn main() {
                   state,
                   plant_grows,
                })
-            }
-            else {
+            } else {
                None
             }
          })

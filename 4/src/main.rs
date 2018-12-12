@@ -1,7 +1,3 @@
-extern crate chrono;
-extern crate lib;
-extern crate regex;
-
 use std::collections::HashMap;
 
 use chrono::prelude::*;

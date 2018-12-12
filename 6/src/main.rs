@@ -1,6 +1,3 @@
-extern crate lib;
-extern crate regex;
-
 use regex::Regex;
 
 use lib::*;

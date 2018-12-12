@@ -1,5 +1,3 @@
-extern crate lib;
-extern crate regex;
 #[macro_use]
 extern crate unic_char_range;
 
