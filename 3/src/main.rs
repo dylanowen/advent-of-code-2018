@@ -1,5 +1,3 @@
-extern crate lib;
-
 use lib::*;
 
 struct Claim<'a> {
@@ -15,7 +13,7 @@ fn main() {
       let mut max_width: usize = 0;
       let mut max_height: usize = 0;
 
-      let claims: Vec<Claim> = contents.lines()
+      let claims: Vec<Claim<'_>> = contents.lines()
          .map(|row| {
             let mut split_row = row.split_whitespace();
 
@@ -58,7 +56,7 @@ fn main() {
    });
 }
 
-fn a(claims: &Vec<Claim>, max_width: usize, max_height: usize) -> Vec<Vec<i32>> {
+fn a(claims: &Vec<Claim<'_>>, max_width: usize, max_height: usize) -> Vec<Vec<i32>> {
    let mut cloth = vec![vec![0; max_height]; max_width];
 
    for claim in claims {
@@ -79,7 +77,7 @@ fn a(claims: &Vec<Claim>, max_width: usize, max_height: usize) -> Vec<Vec<i32>> 
    return cloth;
 }
 
-fn b(claims: &Vec<Claim>, cloth: &Vec<Vec<i32>>) {
+fn b(claims: &Vec<Claim<'_>>, cloth: &Vec<Vec<i32>>) {
    for claim in claims {
       let mut overlap = 0;
       for y in claim.y..(claim.y + claim.height) {
@@ -97,7 +95,7 @@ fn b(claims: &Vec<Claim>, cloth: &Vec<Vec<i32>>) {
    }
 }
 
-fn fill_cloth(claim: &Claim, cloth: &mut Vec<Vec<i32>>) {
+fn fill_cloth(claim: &Claim<'_>, cloth: &mut Vec<Vec<i32>>) {
    for y in claim.y..(claim.y + claim.height) {
       for x in claim.x..(claim.x + claim.width) {
          cloth[x][y] += 1;

@@ -1,5 +1,3 @@
-extern crate lib;
-
 use lib::run_day;
 
 const ASCII_DIFF: i32 = ('a' as i32) - ('A' as i32);

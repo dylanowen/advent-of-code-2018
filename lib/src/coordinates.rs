@@ -107,11 +107,11 @@ impl<T: Clone> Grid<T> {
       GridLocis::for_grid(self)
    }
 
-   pub fn iter(&self) -> GridIterator<T> {
+   pub fn iter(&self) -> GridIterator<'_, T> {
       self.into_iter()
    }
 
-   pub fn enumerate(&self) -> GridEnumerator<T> {
+   pub fn enumerate(&self) -> GridEnumerator<'_, T> {
       GridEnumerator {
          iter: self.into_iter()
       }

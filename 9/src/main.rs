@@ -1,8 +1,3 @@
-extern crate lib;
-extern crate regex;
-
-extern crate doubly;
-
 use doubly::DoublyLinkedList;
 
 use regex::Regex;
