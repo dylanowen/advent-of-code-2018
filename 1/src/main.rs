@@ -2,7 +2,7 @@ use lib::*;
 use std::collections::BTreeSet;
 
 fn main() {
-   run_input("2", "input.txt", &|contents| {
+   run_input("1", "input.txt", &|contents| {
       let movements = contents.split_whitespace()
          .map(|x| x.parse::<i32>().unwrap())
          .collect();
