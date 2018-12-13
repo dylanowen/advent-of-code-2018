@@ -1,4 +1,5 @@
 use std::ops::Range;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct Grid<T> {
@@ -84,6 +85,18 @@ impl<T> Grid<T> {
    }
 }
 
+//impl<T: fmt::Display> fmt::Display for Grid<T> {
+impl<T: fmt::Display> Grid<T> {
+   pub fn print(&self) {
+      for y in self.y_range() {
+         for x in self.x_range() {
+            print!("{} ", self.get(x, y));
+         }
+         println!();
+      }
+   }
+}
+
 impl<T: Clone> Grid<T> {
    pub fn new(default: T, width: usize, height: usize) -> Grid<T> {
       Grid::new_offset(default, width, height, 0, 0)
@@ -146,6 +159,18 @@ impl<'a, T> IntoIterator for &'a Grid<T> {
       GridIterator {
          grid: &self,
          locis: GridLocis::for_grid(self),
+      }
+   }
+}
+
+impl<T: Clone> Clone for Grid<T> {
+   fn clone(&self) -> Self {
+      Grid {
+         width: self.width,
+         height: self.height,
+         x_offset: self.x_offset,
+         y_offset: self.y_offset,
+         grid: self.grid.clone(),
       }
    }
 }
