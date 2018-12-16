@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::ops::Range;
 use std::fmt;
 
@@ -278,7 +279,7 @@ impl Iterator for GridLocis {
    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub struct Loci {
    x: isize,
    y: isize,
@@ -360,19 +361,26 @@ impl Loci {
    pub fn sub_y(&self, inc: isize) -> Loci {
       self.sub(0, inc)
    }
-}
 
-impl Clone for Loci {
-   fn clone(&self) -> Self {
-      Loci {
-         x: self.x,
-         y: self.y,
-      }
+   pub fn neighbors(&self) -> Vec<Loci> {
+      vec![
+         self.add_x(1),
+         self.sub_x(1),
+         self.add_y(1),
+         self.sub_y(1),
+      ]
    }
 }
 
-impl PartialEq for Loci {
-   fn eq(&self, other: &Loci) -> bool {
-      self.x == other.x && self.y == other.y
+impl PartialOrd for Loci {
+   fn partial_cmp(&self, other: &Loci) -> Option<Ordering> {
+      Some(self.cmp(other))
+   }
+}
+
+impl Ord for Loci {
+   fn cmp(&self, other: &Loci) -> Ordering {
+      self.y.cmp(&other.y)
+         .then(self.x.cmp(&other.x))
    }
 }
