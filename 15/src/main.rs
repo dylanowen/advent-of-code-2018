@@ -59,53 +59,14 @@ fn main() {
       (units, map)
    }
 
-   run_input("15", "sample_input_2.txt", &|contents| {
-      let (units, map) = parse_input(contents);
+   run_tests("15", "test_input_{}.txt",
+             vec![36334, 39514, 27755, 28944, 18740, 13400, 13987, 10234],
+             &|contents| {
+                let (units, map) = parse_input(contents);
 
-      assert_eq!(36334, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_3.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(39514, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_5.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(27755, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_6.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(28944, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_4.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(18740, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_7.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(13400, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_8.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(13987, a(&units, &map));
-   });
-
-   run_input("15", "sample_input_9.txt", &|contents| {
-      let (units, map) = parse_input(contents);
-
-      assert_eq!(10234, a(&units, &map));
-   });
+                a(&units, &map)
+             },
+   );
 
    run_day("15", &|contents, is_sample| {
       let (units, map) = parse_input(contents);
@@ -142,9 +103,9 @@ fn b(input_units: &Vec<Unit>, map: &Grid<bool>) -> isize {
 }
 
 fn main_game<R>(input_units: &Vec<Unit>,
-             map: &Grid<bool>,
-             elf_attack_power: isize,
-             quit_on_death: &R) -> isize where
+                map: &Grid<bool>,
+                elf_attack_power: isize,
+                quit_on_death: &R) -> isize where
    R: Fn(&Unit) -> bool {
    let mut units: Vec<RefCell<Unit>> = input_units.iter()
       .map(|u| RefCell::new(u.clone()))

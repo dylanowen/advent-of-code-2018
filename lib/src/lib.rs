@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::prelude::*;
+use std::fmt::Debug;
 
 pub mod coordinates;
 
@@ -22,6 +23,23 @@ pub fn run_input<R>(day: &str, file_name: &str, runner: &R) where
 
    println!("Running: {}", file_name);
    runner(&input);
+}
+
+pub fn run_tests<C, R: Eq + Debug>(day: &str,
+                       file_format: &str,
+                       expected: Vec<R>,
+                       runner: &C) where
+   C: Fn(&String) -> R {
+
+   for i in 1..=expected.len() {
+      let e = &expected[i - 1];
+      let file_name_segments: Vec<&str> = file_format.split("{}").collect();
+      let file_name = file_name_segments.join(i.to_string().as_str());
+
+      run_input(day, file_name.as_str(), &|contents| {
+         assert_eq!(*e, runner(contents));
+      })
+   }
 }
 
 pub fn parse_input(day: &str, file_name: &str) -> String {
