@@ -362,6 +362,26 @@ impl Loci {
       self.sub(0, inc)
    }
 
+   #[inline]
+   pub fn max_x(&self, other_x: isize) -> Loci {
+      self.with_x(self.x.max(other_x))
+   }
+
+   #[inline]
+   pub fn min_x(&self, other_x: isize) -> Loci {
+      self.with_x(self.x.min(other_x))
+   }
+
+   #[inline]
+   pub fn max_y(&self, other_y: isize) -> Loci {
+      self.with_y(self.y.max(other_y))
+   }
+
+   #[inline]
+   pub fn min_y(&self, other_y: isize) -> Loci {
+      self.with_y(self.y.min(other_y))
+   }
+
    pub fn neighbors(&self) -> Vec<Loci> {
       vec![
          self.add_x(1),
