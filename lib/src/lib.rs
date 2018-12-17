@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
 use std::fmt::Debug;
+use std::time::{Instant, Duration};
 
 pub mod coordinates;
 
@@ -21,16 +22,24 @@ pub fn run_input<R>(day: &str, file_name: &str, runner: &R) where
    R: Fn(&String) {
    let input = parse_input(day, file_name);
 
-   println!("Running: {}", file_name);
-   runner(&input);
+   // give our output a random color
+   let random_color_index = (rand::random::<u8>() % 5) + 2;
+   let color = format!("\u{001B}[3{}m", random_color_index);
+
+   println!("{}Running:\u{001B}[0m {}", color, file_name);
+
+   let elapsed = benchmark(|| {
+      runner(&input);
+   });
+
+   println!("{}Finished In:\u{001B}[0m {:01}.{:03}s", color, elapsed.as_secs(), elapsed.subsec_millis());
 }
 
 pub fn run_tests<C, R: Eq + Debug>(day: &str,
-                       file_format: &str,
-                       expected: Vec<R>,
-                       runner: &C) where
+                                   file_format: &str,
+                                   expected: Vec<R>,
+                                   runner: &C) where
    C: Fn(&String) -> R {
-
    for i in 1..=expected.len() {
       let e = &expected[i - 1];
       let file_name_segments: Vec<&str> = file_format.split("{}").collect();
@@ -40,6 +49,13 @@ pub fn run_tests<C, R: Eq + Debug>(day: &str,
          assert_eq!(*e, runner(contents));
       })
    }
+}
+
+pub fn benchmark<C>(runner: C) -> Duration where
+   C: Fn() {
+   let now = Instant::now();
+   runner();
+   return now.elapsed();
 }
 
 pub fn parse_input(day: &str, file_name: &str) -> String {
