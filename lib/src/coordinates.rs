@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::ops::Range;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Hash)]
 pub struct Grid<T> {
    width: usize,
    height: usize,
