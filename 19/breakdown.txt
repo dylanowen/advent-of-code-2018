@@ -1,0 +1,102 @@
+let mut zero = 0;
+let mut one = 10550400;
+let mut two = 10551354;
+let mut three = 2;
+let mut four = 1;
+let mut five = 1;
+
+while four <= two {
+  if (four % two) == 0 {
+    zero += four;
+    println!("{} = {} * {}", zero, four, five);
+  }
+
+  four += 1;
+}
+
+while four <= two {
+  five = 1;
+  while five <= two {
+     one = four * five;
+
+     if one == two {
+        zero += four;
+        println!("{} = {} * {}", zero, four, five);
+     }
+
+     five += 1;
+  }
+
+  four += 1;
+}
+
+
+
+JMP_01:
+  four = 1
+  five = 1
+
+  one = four * five
+  if one == two {
+    jump JMP_7
+  }
+  else {
+    jump JMP_8
+  }
+JMP_07:
+  zero += four
+JMP_08:
+  five++
+  if (five > two) {
+    jump JMP_12
+  }
+  else {
+    jump 02
+  }
+JMP_12:
+  four++
+  if (four > two) {
+    exit
+  }
+  else {
+    jump JMP1
+  }
+JMP_15:
+
+#ip 3
+00: addi 3 16 3     jump to (register[3] + 16)
+01: seti 1 3 4      register[4] = 1
+02: seti 1 8 5      register[5] = 1
+03: mulr 4 5 1      register[1] = register[4] * register[5]
+04: eqrr 1 2 1      register[1] = if (register[1] == register[2]) 1 else 0
+05: addr 1 3 3      jump by register[1]
+06: addi 3 1 3      jump by 1
+07: addr 4 0 0      register[0] = register[4] + register[0]
+08: addi 5 1 5      register[5] = register[5] + 1
+09: gtrr 5 2 1      register[1] = if (register[5] > register[2]) 1 else 0
+10: addr 3 1 3      jump by register[1]
+11: seti 2 6 3      jump to 2
+12: addi 4 1 4      register[4] = register[4] + 1
+13: gtrr 4 2 1      register[1] = if (register[4] > register[2]) 1 else 0
+14: addr 1 3 3      jump by register[1]
+15: seti 1 1 3      jump to 1
+16: mulr 3 3 3      exit
+addi 2 2 2
+mulr 2 2 2
+mulr 3 2 2
+muli 2 11 2
+addi 1 5 1
+mulr 1 3 1
+addi 1 8 1
+addr 2 1 2
+addr 3 0 3
+seti 0 5 3
+setr 3 9 1
+mulr 1 3 1
+addr 3 1 1
+mulr 3 1 1
+muli 1 14 1
+mulr 1 3 1
+addr 2 1 2
+seti 0 9 0
+seti 0 9 3
