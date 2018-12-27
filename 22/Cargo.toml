@@ -1,0 +1,13 @@
+[package]
+name = "22"
+version = "0.1.0"
+authors = ["Dylan"]
+edition = "2018"
+
+[dependencies]
+lib = { path = "../lib" }
+regex = "1"
+priority-queue = "0.5.2"
+
+[[bin]]
+name = "22"
