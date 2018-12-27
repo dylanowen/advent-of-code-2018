@@ -5,8 +5,18 @@ authors = ["Dylan"]
 edition = "2018"
 
 [dependencies]
-lib = { path = "../lib" }
+common = { path = "../common" }
 regex = "1"
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1.5"
 
-[[bin]]
-name = "17"
+[lib]
+name = "web17"
+path = "src/web.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  "console"
+]

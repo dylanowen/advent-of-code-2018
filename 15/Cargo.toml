@@ -5,7 +5,7 @@ authors = ["Dylan"]
 edition = "2018"
 
 [dependencies]
-lib = { path = "../lib" }
+common = { path = "../common" }
 termion = "1.5.1"
 
 [[bin]]

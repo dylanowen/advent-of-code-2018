@@ -1,12 +1,8 @@
 [package]
-name = "11"
+name = "common"
 version = "0.1.0"
 authors = ["Dylan"]
 edition = "2018"
 
 [dependencies]
-common = { path = "../common" }
-regex = "1"
-
-[[bin]]
-name = "11"
+rand = "0.6.1"

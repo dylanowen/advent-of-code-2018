@@ -5,7 +5,7 @@ authors = ["Dylan"]
 edition = "2018"
 
 [dependencies]
-lib = { path = "../lib" }
+common = { path = "../common" }
 regex = "1"
 chrono = "0.4"
 

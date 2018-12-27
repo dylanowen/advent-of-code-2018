@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-  "lib",
+  "common",
   "1",
   "2",
   "3",
@@ -23,11 +23,11 @@ members = [
   "19",
   "20",
   "21",
-  #"22",
-  #"23",
+  "22",
+  "23",
   "24",
   "25",
 ]
 
 [profile.dev]
-# opt-level = 3
+# opt-level = 3git a

@@ -382,6 +382,21 @@ impl Loci {
       self.with_y(self.y.min(other_y))
    }
 
+   #[inline]
+   pub fn valid_neighbors<T>(&self, grid: &Grid<T>) -> Vec<Loci> {
+      self.neighbors().iter()
+         .filter_map(|neighbor| {
+            if grid.x_min() <= neighbor.x() && neighbor.x() < grid.x_max() &&
+               grid.y_min() <= neighbor.y() && neighbor.y() < grid.y_max() {
+               Some(*neighbor)
+            } else {
+               None
+            }
+         })
+         .collect()
+   }
+
+   #[inline]
    pub fn neighbors(&self) -> Vec<Loci> {
       vec![
          self.add_x(1),

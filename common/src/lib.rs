@@ -9,6 +9,12 @@ pub fn run_day<R>(day: &str, runner: &R) where
    R: Fn(&String, bool) {
    run_day_sample(day, runner);
 
+   run_day_real(day, runner);
+}
+
+// for when we want to skip our sample tests
+pub fn run_day_real<R>(day: &str, runner: &R) where
+   R: Fn(&String, bool) {
    run_input(day, "input.txt", &|contents| runner(contents, false));
 }
 
@@ -20,7 +26,7 @@ pub fn run_day_sample<R>(day: &str, runner: &R) where
 
 pub fn run_input<R>(day: &str, file_name: &str, runner: &R) where
    R: Fn(&String) {
-   let input = parse_input(day, file_name);
+   let input = read_input(day, file_name);
 
    // give our output a random color
    let random_color_index = (rand::random::<u8>() % 5) + 2;
@@ -58,7 +64,7 @@ pub fn benchmark<C>(runner: C) -> Duration where
    return now.elapsed();
 }
 
-pub fn parse_input(day: &str, file_name: &str) -> String {
+pub fn read_input(day: &str, file_name: &str) -> String {
    let mut f = load_input(day, file_name);
 
    let mut contents = String::new();
