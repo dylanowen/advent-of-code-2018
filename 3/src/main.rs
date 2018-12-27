@@ -1,4 +1,4 @@
-use lib::*;
+use common::*;
 
 struct Claim<'a> {
    id: &'a str,

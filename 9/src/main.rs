@@ -2,7 +2,7 @@ use doubly::DoublyLinkedList;
 
 use regex::Regex;
 
-use lib::*;
+use common::*;
 
 fn main() {
    run_day("9", &|contents, _is_sample| {

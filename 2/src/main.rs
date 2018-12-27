@@ -1,4 +1,4 @@
-use lib::*;
+use common::*;
 use std::collections::BTreeSet;
 
 fn main() {

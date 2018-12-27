@@ -1,7 +1,7 @@
 use regex::Regex;
 use std::fmt;
 
-use lib::*;
+use common::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 enum OpCode {
@@ -112,19 +112,7 @@ fn b(program: &Vec<Instruction>) -> usize {
             break 'mid;
          }
 
-         one = 0;
-         loop {
-            println!("inner: {:5} {:8} {:5} {:5}", one, three, four, five);
-            five = (one + 1) * 256;
-
-            if five > four {
-               break;
-            }
-
-            one += 1;
-         }
-
-         four = one
+         four = four / 256
       }
 
       //println!("{}", three);

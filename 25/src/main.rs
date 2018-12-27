@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::collections::BTreeSet;
 
-use lib::*;
+use common::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 struct Coordinate(isize, isize, isize, isize);

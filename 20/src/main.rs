@@ -5,10 +5,10 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::Hash;
 use std::hash::Hasher;
 
-use lib::*;
-use lib::coordinates::Grid;
-use lib::coordinates::OffsetLociX;
-use lib::coordinates::OffsetLociY;
+use common::*;
+use common::coordinates::Grid;
+use common::coordinates::OffsetLociX;
+use common::coordinates::OffsetLociY;
 
 
 const ONE_MASK: usize = 0b1;
@@ -46,7 +46,7 @@ fn main() {
       area
    }
 
-   run_day("18", &|contents, is_sample| {
+   run_day("20", &|contents, is_sample| {
       let area = parse_input(contents);
 
       let a_result = a(&area);

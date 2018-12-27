@@ -4,7 +4,7 @@ use std::option::Option::{Some, None};
 use std::cmp::Ordering;
 use std::cell::RefCell;
 
-use lib::*;
+use common::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 enum Attack {

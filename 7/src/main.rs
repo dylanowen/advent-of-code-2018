@@ -6,7 +6,7 @@ use std::iter::FromIterator;
 
 use regex::Regex;
 
-use lib::*;
+use common::*;
 
 #[derive(PartialEq)]
 enum StepState {

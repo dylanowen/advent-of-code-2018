@@ -1,9 +1,9 @@
 use std::collections::HashMap;
-use lib::*;
-use lib::coordinates::Grid;
-use lib::coordinates::Loci;
-use lib::coordinates::OffsetLociX;
-use lib::coordinates::OffsetLociY;
+use common::*;
+use common::coordinates::Grid;
+use common::coordinates::Loci;
+use common::coordinates::OffsetLociX;
+use common::coordinates::OffsetLociY;
 
 fn main() {
    assert_eq!(4, calc_power_level(&Loci::new(3, 5), 8));

@@ -1,9 +1,9 @@
 use regex::Regex;
 
-use lib::*;
-use lib::coordinates::Grid;
-use lib::coordinates::Loci;
-use lib::coordinates::OffsetLociX;
+use common::*;
+use common::coordinates::Grid;
+use common::coordinates::Loci;
+use common::coordinates::OffsetLociX;
 
 struct Point {
    loci: Loci,

@@ -1,7 +1,7 @@
 use regex::Regex;
 use std::fmt;
 
-use lib::*;
+use common::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 enum OpCode {

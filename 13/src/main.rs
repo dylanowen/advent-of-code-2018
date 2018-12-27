@@ -1,10 +1,10 @@
-use lib::*;
+use common::*;
 
 use std::fmt;
-use lib::coordinates::Grid;
-use lib::coordinates::Loci;
-use lib::coordinates::OffsetLociX;
-use lib::coordinates::OffsetLociY;
+use common::coordinates::Grid;
+use common::coordinates::Loci;
+use common::coordinates::OffsetLociX;
+use common::coordinates::OffsetLociY;
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]

@@ -6,11 +6,11 @@ use std::cmp::Ordering;
 
 use priority_queue::PriorityQueue;
 
-use lib::*;
-use lib::coordinates::Grid;
-use lib::coordinates::Loci;
-use lib::coordinates::OffsetLociX;
-use lib::coordinates::OffsetLociY;
+use common::*;
+use common::coordinates::Grid;
+use common::coordinates::Loci;
+use common::coordinates::OffsetLociX;
+use common::coordinates::OffsetLociY;
 
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
@@ -64,19 +64,19 @@ fn main() {
       (depth, target)
    }
 
-//   run_tests("22", "test_input_{}.txt",
-//             vec![10], &|contents| {
-//         let (depth, target) = parse_input(contents);
-//
-//         let cave = build_cave(depth, &target);
-//
-//         cave.print();
-//         println!();
-//
-//         b(&target, &cave)
-//      });
+   run_tests("22", "test_input_{}.txt",
+             vec![18], &|contents| {
+         let (depth, target) = parse_input(contents);
 
-   run_day_real("22", &|contents, is_sample| {
+         let cave = build_cave(depth, &target);
+
+         cave.print();
+         println!();
+
+         b(&target, &cave)
+      });
+
+   run_day("22", &|contents, is_sample| {
       let (depth, target) = parse_input(contents);
 
       let cave = build_cave(depth, &target);
@@ -150,14 +150,18 @@ impl fmt::Display for PathScore {
 fn find_shortest_path(target: &Loci, cave: &Grid<Region>) -> Option<isize> {
    let mut debug_grid = Grid::new((0, Tool::Neither), cave.width(), cave.height());
 
-   let start = Loci::new(0, 0);
+   let start = PathScore {
+      location: Loci::new(0, 0),
+      tool: Tool::Torch,
+      best_path_minutes: 0,
+   };
    let goal = target.clone();
 
-   let heuristic_cost_estimate = |from: &Loci, tool: &Tool| -> isize {
-      let distance = from.sub_loci(&goal);
+   let heuristic_cost_estimate = |from: &PathScore| -> isize {
+      let distance = from.location.sub_loci(&goal);
 
       let mut tool_tax = 0;
-      if *tool == Tool::ClimbingGear {
+      if from.tool == Tool::ClimbingGear {
          tool_tax += 7;
       }
 
@@ -166,30 +170,26 @@ fn find_shortest_path(target: &Loci, cave: &Grid<Region>) -> Option<isize> {
 
    let mut closed_set: BTreeSet<PathScore> = BTreeSet::new();
    let mut open_set: PriorityQueue<PathScore, Reverse<isize>> = PriorityQueue::new();
-   open_set.push(PathScore {
-      location: start,
-      tool: Tool::Torch,
-      best_path_minutes: 0,
-   }, Reverse(heuristic_cost_estimate(&start, &Tool::Torch)));
+   open_set.push(start, Reverse(heuristic_cost_estimate(&start)));
 
 //   let mut real_score: HashMap<(Loci, Tool), isize> = HashMap::new();
 //   real_score.insert((start, Tool::Torch), 0);
 
    while !open_set.is_empty() {
-//      for y in debug_grid.y_range() {
-//         for x in debug_grid.x_range() {
-//            print!("{:2}{} ", debug_grid.get(x, y).0, debug_grid.get(x, y).1);
-//         }
-//         println!();
-//      }
-//      for (p_score, h) in open_set.clone().into_sorted_iter() {
-//         println!("{} {} ", h.0, p_score);
-//      }
+      for y in debug_grid.y_range() {
+         for x in debug_grid.x_range() {
+            print!("{:2}{} ", debug_grid.get(x, y).0, debug_grid.get(x, y).1);
+         }
+         println!();
+      }
+      for (p_score, h) in open_set.clone().into_sorted_iter() {
+         println!("{} {} ", h.0, p_score);
+      }
 //      println!();
 //      for p_score in closed_set.iter() {
 //         println!("{}", p_score);
 //      }
-      //println!();
+      println!();
 
       let (current, _) = open_set.pop().unwrap();
 
@@ -203,9 +203,8 @@ fn find_shortest_path(target: &Loci, cave: &Grid<Region>) -> Option<isize> {
          for y in debug_grid.y_range() {
             for x in debug_grid.x_range() {
                if x == target.x() && y == target.y() {
-                  print!("{:3}**", debug_grid.get(x, y).0);
-               }
-               else {
+                  print!("{:3}* ", debug_grid.get(x, y).0);
+               } else {
                   print!("{:3}{} ", debug_grid.get(x, y).0, debug_grid.get(x, y).1);
                }
             }
@@ -217,57 +216,112 @@ fn find_shortest_path(target: &Loci, cave: &Grid<Region>) -> Option<isize> {
 
       closed_set.insert(current);
 
-      //println!("{:?}", current.location.valid_neighbors(cave));
-      for neighbor in current.location.valid_neighbors(cave) {
-         // get the region for this neighbor
-         let neighbor_region = cave.get_loci(&neighbor);
+      // get our possible moves
+      let mut possible_moves: Vec<PathScore> = current.location.valid_neighbors(cave).iter()
+         .filter_map(|neighbor| {
+            // get the region for this neighbor
+            let neighbor_region = cave.get_loci(&neighbor);
 
-         for i in 0..TOOLS.len() {
-            let tool = TOOLS[i].clone();
-            // check if this tool is allowed for this region
-            if !neighbor_region.is_tool_valid(&tool) {
-               continue;
-            }
-
-            let mut neighbor_score = PathScore {
-               location: neighbor,
-               tool,
-               best_path_minutes: isize::max_value(),
-            };
-
-            // check if this region has already been checked
-            if closed_set.contains(&neighbor_score) {
-               continue;
-            }
-
-            let move_cost;
-            if tool == current.tool {
-               move_cost = 1;
+            if neighbor_region.is_tool_valid(&current.tool) {
+               Some(PathScore {
+                  location: *neighbor,
+                  tool: current.tool,
+                  best_path_minutes: current.best_path_minutes + 1,
+               })
             } else {
-               move_cost = 8;
+               None
             }
+         })
+         .collect();
 
-            let tentative_real_score = current.best_path_minutes + move_cost;
-
-            // check if we already know about this neighbor / tool
-            match open_set.iter().find(|(p_score, _)| **p_score == neighbor_score) {
-               Some((old_value, _)) => {
-                  // if our tentative real_score is worse, return
-                  if tentative_real_score >= old_value.best_path_minutes {
-                     continue;
-                  }
-               }
-               None => {}
+      // get our possible tool changes
+      let tool_changes = TOOLS.iter()
+         .filter_map(|tool| {
+            if *tool != current.tool {
+               Some(PathScore {
+                  location: current.location,
+                  tool: tool.clone(),
+                  best_path_minutes: current.best_path_minutes + 7,
+               })
+            } else {
+               None
             }
+         });
 
-            // best path for now so record it
-            neighbor_score.best_path_minutes = tentative_real_score;
-            //println!("{} for {}", neighbor_score, tentative_real_score + heuristic_cost_estimate(&neighbor, &tool));
-            open_set.push(neighbor_score, Reverse(tentative_real_score + heuristic_cost_estimate(&neighbor, &tool)));
+      possible_moves.extend(tool_changes);
 
-            //real_score.insert((neighbor, tool), tentative_real_score);
+      for score in possible_moves {
+         // check if this region has already been checked
+         if closed_set.contains(&score) {
+            continue;
          }
+
+         // check if we already know about this neighbor / tool
+         match open_set.iter().find(|(p_score, _)| **p_score == score) {
+            Some((old_value, _)) => {
+               // if our tentative real_score is worse, return
+               if score.best_path_minutes >= old_value.best_path_minutes {
+                  continue;
+               }
+            }
+            None => {}
+         }
+
+         // best path for now so record it
+         open_set.push(score, Reverse(score.best_path_minutes + heuristic_cost_estimate(&score)));
       }
+
+
+      //println!("{:?}", current.location.valid_neighbors(cave));
+//      for neighbor in current.location.valid_neighbors(cave) {
+//
+//
+//         for i in 0..TOOLS.len() {
+//            let tool = TOOLS[i].clone();
+//            // check if this tool is allowed for this region
+//            if !neighbor_region.is_tool_valid(&tool) {
+//               continue;
+//            }
+//
+//            let mut neighbor_score = PathScore {
+//               location: neighbor,
+//               tool,
+//               best_path_minutes: isize::max_value(),
+//            };
+//
+//            // check if this region has already been checked
+//            if closed_set.contains(&neighbor_score) {
+//               continue;
+//            }
+//
+//            let move_cost;
+//            if tool == current.tool {
+//               move_cost = 1;
+//            } else {
+//               move_cost = 8;
+//            }
+//
+//            let tentative_real_score = current.best_path_minutes + move_cost;
+//
+//            // check if we already know about this neighbor / tool
+//            match open_set.iter().find(|(p_score, _)| **p_score == neighbor_score) {
+//               Some((old_value, _)) => {
+//                  // if our tentative real_score is worse, return
+//                  if tentative_real_score >= old_value.best_path_minutes {
+//                     continue;
+//                  }
+//               }
+//               None => {}
+//            }
+//
+//            // best path for now so record it
+//            neighbor_score.best_path_minutes = tentative_real_score;
+//            //println!("{} for {}", neighbor_score, tentative_real_score + heuristic_cost_estimate(&neighbor, &tool));
+//            open_set.push(neighbor_score, Reverse(tentative_real_score + heuristic_cost_estimate(&neighbor, &tool)));
+//
+//            //real_score.insert((neighbor, tool), tentative_real_score);
+//         }
+//      }
    }
 
    // no path could be found

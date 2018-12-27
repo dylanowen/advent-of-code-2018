@@ -3,9 +3,9 @@ use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
-use lib::*;
-use lib::coordinates::Grid;
-use lib::coordinates::Loci;
+use common::*;
+use common::coordinates::Grid;
+use common::coordinates::Loci;
 
 #[derive(Eq, PartialEq, Debug, Copy, Clone)]
 struct Unit {

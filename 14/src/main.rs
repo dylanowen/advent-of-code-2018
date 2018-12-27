@@ -1,4 +1,4 @@
-use lib::*;
+use common::*;
 
 fn main() {
    assert_eq!("5158916779", a(9));

@@ -1,10 +1,10 @@
 use regex::Regex;
 
-use lib::*;
-use lib::coordinates::Grid;
-use lib::coordinates::Loci;
-use lib::coordinates::OffsetLociX;
-use lib::coordinates::OffsetLociY;
+use common::*;
+use common::coordinates::Grid;
+use common::coordinates::Loci;
+use common::coordinates::OffsetLociX;
+use common::coordinates::OffsetLociY;
 
 fn main() {
    run_day("6", &|contents, is_sample| {
