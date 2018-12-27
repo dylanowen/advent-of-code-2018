@@ -1,6 +1,8 @@
 use std::fmt;
-use std::collections::HashMap;
+use std::collections::BTreeSet;
 use regex::Regex;
+use std::cmp::Reverse;
+use std::cmp::Ordering;
 
 use priority_queue::PriorityQueue;
 
@@ -25,7 +27,7 @@ enum RegionType {
    Narrow,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Hash, PartialOrd, Ord)]
 enum Tool {
    Torch,
    ClimbingGear,
@@ -63,7 +65,7 @@ fn main() {
    }
 
 //   run_tests("22", "test_input_{}.txt",
-//             vec![3], &|contents| {
+//             vec![10], &|contents| {
 //         let (depth, target) = parse_input(contents);
 //
 //         let cave = build_cave(depth, &target);
@@ -74,7 +76,7 @@ fn main() {
 //         b(&target, &cave)
 //      });
 
-   run_day("22", &|contents, is_sample| {
+   run_day_real("22", &|contents, is_sample| {
       let (depth, target) = parse_input(contents);
 
       let cave = build_cave(depth, &target);
@@ -83,16 +85,12 @@ fn main() {
 
       let a_result = a(&target, &cave);
       println!("Result A: {}", a_result);
-
-
+      let b_result = b(&target, &cave);
+      println!("Result B: {}", b_result);
 
       if is_sample {
          assert_eq!(114, a_result);
-         //assert_eq!(45, b_result);
-      }
-      else {
-         let b_result = b(&target, &cave);
-         println!("Result B: {}", b_result);
+         assert_eq!(45, b_result);
       }
    });
 }
@@ -113,167 +111,149 @@ fn b(target: &Loci, cave: &Grid<Region>) -> isize {
    find_shortest_path(target, cave).unwrap()
 }
 
+#[derive(Copy, Clone, Debug, Hash)]
+struct PathScore {
+   location: Loci,
+   tool: Tool,
+   best_path_minutes: isize,
+}
+
+impl PartialEq for PathScore {
+   fn eq(&self, other: &PathScore) -> bool {
+      // don't check our minutes for equality
+      self.location == other.location && self.tool == other.tool
+   }
+}
+
+impl Eq for PathScore {}
+
+impl Ord for PathScore {
+   fn cmp(&self, other: &PathScore) -> Ordering {
+      self.location.cmp(&other.location)
+         .then(self.tool.cmp(&other.tool))
+   }
+}
+
+impl PartialOrd for PathScore {
+   fn partial_cmp(&self, other: &PathScore) -> Option<Ordering> {
+      Some(self.cmp(other))
+   }
+}
+
+impl fmt::Display for PathScore {
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+      write!(f, "{}:({},{})[{}]", self.best_path_minutes, self.location.x(), self.location.y(), self.tool)
+   }
+}
+
 // A* Search
 fn find_shortest_path(target: &Loci, cave: &Grid<Region>) -> Option<isize> {
+   let mut debug_grid = Grid::new((0, Tool::Neither), cave.width(), cave.height());
+
    let start = Loci::new(0, 0);
-   let goal = Loci::new(target.x(), target.y());
+   let goal = target.clone();
 
    let heuristic_cost_estimate = |from: &Loci, tool: &Tool| -> isize {
       let distance = from.sub_loci(&goal);
 
       let mut tool_tax = 0;
       if *tool == Tool::ClimbingGear {
-         tool_tax += 6;
+         tool_tax += 7;
       }
 
       distance.x().abs() + distance.y().abs() + tool_tax
    };
 
-   let mut closed_set: Vec<(Loci, Tool)> = Vec::new();
-   let mut open_set: PriorityQueue<(Loci, Tool), isize> = PriorityQueue::new();
-   open_set.push((start, Tool::Torch), 0);
+   let mut closed_set: BTreeSet<PathScore> = BTreeSet::new();
+   let mut open_set: PriorityQueue<PathScore, Reverse<isize>> = PriorityQueue::new();
+   open_set.push(PathScore {
+      location: start,
+      tool: Tool::Torch,
+      best_path_minutes: 0,
+   }, Reverse(heuristic_cost_estimate(&start, &Tool::Torch)));
 
-   let mut came_from: HashMap<(Loci, Tool), (Loci, Tool)> = HashMap::new();
-//   let mut g_score: HashMap<(Loci, Tool), isize> = HashMap::new();
-//   g_score.insert((start, Tool::Torch), 0);
-
-   let mut heuristic_score: HashMap<(Loci, Tool), isize> = HashMap::new();
-   heuristic_score.insert((start, Tool::Torch), heuristic_cost_estimate(&start, &Tool::Torch));
+//   let mut real_score: HashMap<(Loci, Tool), isize> = HashMap::new();
+//   real_score.insert((start, Tool::Torch), 0);
 
    while !open_set.is_empty() {
-      let ((current, current_tool), current_score) = open_set.pop().unwrap();
-//         open_set.iter()
-//            .fold((goal.clone(), Tool::Torch, isize::max_value()), |best, node| {
-//               let score = *heuristic_score.get(node).unwrap();
-//               if score < best.2 {
-//                  (node.0.clone(), node.1, score)
-//               } else {
-//                  best
-//               }
-//            })
-//      };
-
-
-//      if loop_count % 1000 == 0 {
-//         for y in cave.y_range() {
-//            for x in cave.x_range() {
-//               let loci = Loci::new(x, y);
-//
-//               if *target == loci {
-//                  print!("T ");
-//               } else {
-//                  let found = came_from.iter()
-//                     .find_map(|l| {
-//                        if (l.0).0 == loci {
-//                           Some((l.1).0)
-//                        } else {
-//                           None
-//                        }
-//                     });
-//
-//                  match found {
-//                     Some(from) => {
-//                        if from.x() < x {
-//                           print!("< ")
-//                        } else if from.x() > x {
-//                           print!("> ")
-//                        } else if from.y() < y {
-//                           print!("^ ")
-//                        } else {
-//                           print!("v ")
-//                        }
-//                     }
-//                     None => {
-//                        print!("{} ", cave.get(x, y).region_type._simple_string());
-//                     }
-//                  }
-//               }
-//            }
-//            println!();
+//      for y in debug_grid.y_range() {
+//         for x in debug_grid.x_range() {
+//            print!("{:2}{} ", debug_grid.get(x, y).0, debug_grid.get(x, y).1);
 //         }
 //         println!();
 //      }
+//      for (p_score, h) in open_set.clone().into_sorted_iter() {
+//         println!("{} {} ", h.0, p_score);
+//      }
+//      println!();
+//      for p_score in closed_set.iter() {
+//         println!("{}", p_score);
+//      }
+      //println!();
 
+      let (current, _) = open_set.pop().unwrap();
 
-      if current == goal {
-//         let mut path = Vec::new();
-//         let mut back_track = goal;
-//         while back_track != start {
-//            path.push(back_track);
-//            back_track = came_from.get(&back_track).unwrap().clone();
-//         }
-//         path.reverse();
-//
-//         for y in cave.y_range() {
-//            for x in cave.x_range() {
-//               if path.contains(&Loci::new(x, y)) {
-//                  print!("\u{001B}[33m*\u{001B}[0m ");
-//               } else if target.x() == x && target.y() == y {
-//                  print!("\u{001B}[32mT\u{001B}[0m ");
-//               } else {
-//                  print!("{} ", cave.get(x, y));
-//               }
-////               if target.x() == x && target.y() == y {
-////                  print!("T ");
-////               } else if path.contains(&Loci::new(x, y)) {
-////                  print!("* ");
-////               } else {
-////                  print!("{} ", cave.get(x, y).region_type.simple_string());
-////               }
-//            }
-//            println!();
-//         }
-
-         if !RegionType::Rocky.is_tool_valid(&current_tool) {
-            // add seven for changing our tool to move
-            return Some(current_score + 7);
-         } else {
-            // add one for a successful move
-            return Some(current_score + 1);
-         }
+      // debug
+      let last_debug = debug_grid.get_loci(&current.location);
+      if last_debug.0 <= 0 || last_debug.0 > current.best_path_minutes {
+         debug_grid.set_loci(&current.location, (current.best_path_minutes, current.tool));
       }
 
-      closed_set.push((current, current_tool));
+      if current.location == goal {
+         for y in debug_grid.y_range() {
+            for x in debug_grid.x_range() {
+               if x == target.x() && y == target.y() {
+                  print!("{:3}**", debug_grid.get(x, y).0);
+               }
+               else {
+                  print!("{:3}{} ", debug_grid.get(x, y).0, debug_grid.get(x, y).1);
+               }
+            }
+            println!();
+         }
 
+         return Some(current.best_path_minutes);
+      }
 
-      let neighbors: Vec<Loci> = current.neighbors().iter()
-         .filter(|neighbor| {
-            neighbor.x() >= 0 && neighbor.y() >= 0
-         })
-         // TODO do I need to clone these?
-         .map(|neighbor| neighbor.clone())
-         .collect();
+      closed_set.insert(current);
 
-      for neighbor in neighbors {
+      //println!("{:?}", current.location.valid_neighbors(cave));
+      for neighbor in current.location.valid_neighbors(cave) {
          // get the region for this neighbor
          let neighbor_region = cave.get_loci(&neighbor);
 
          for i in 0..TOOLS.len() {
             let tool = TOOLS[i].clone();
             // check if this tool is allowed for this region
-           if !neighbor_region.is_tool_valid(&tool) {
-              continue
-           }
+            if !neighbor_region.is_tool_valid(&tool) {
+               continue;
+            }
+
+            let mut neighbor_score = PathScore {
+               location: neighbor,
+               tool,
+               best_path_minutes: isize::max_value(),
+            };
 
             // check if this region has already been checked
-            if closed_set.contains(&(neighbor, tool)) {
+            if closed_set.contains(&neighbor_score) {
                continue;
             }
 
             let move_cost;
-            if tool == current_tool {
+            if tool == current.tool {
                move_cost = 1;
             } else {
-               move_cost = 7;
+               move_cost = 8;
             }
 
-            //let tentative_g_score = *g_score.get(&(current, current_tool)).unwrap() + move_cost;
-            let tentative_g_score = current_score + move_cost;
+            let tentative_real_score = current.best_path_minutes + move_cost;
 
             // check if we already know about this neighbor / tool
-            match open_set.get_priority(&(neighbor, tool)) {
-               Some(existing_score) => {
-                  if tentative_g_score >= *existing_score {
+            match open_set.iter().find(|(p_score, _)| **p_score == neighbor_score) {
+               Some((old_value, _)) => {
+                  // if our tentative real_score is worse, return
+                  if tentative_real_score >= old_value.best_path_minutes {
                      continue;
                   }
                }
@@ -281,10 +261,11 @@ fn find_shortest_path(target: &Loci, cave: &Grid<Region>) -> Option<isize> {
             }
 
             // best path for now so record it
-            open_set.push((neighbor, tool),  tentative_g_score);
-            came_from.insert((neighbor, tool), (current.clone(), current_tool.clone()));
-            //g_score.insert((neighbor.clone(), tool.clone()), tentative_g_score);
-            heuristic_score.insert((neighbor, tool), tentative_g_score + heuristic_cost_estimate(&neighbor, &tool));
+            neighbor_score.best_path_minutes = tentative_real_score;
+            //println!("{} for {}", neighbor_score, tentative_real_score + heuristic_cost_estimate(&neighbor, &tool));
+            open_set.push(neighbor_score, Reverse(tentative_real_score + heuristic_cost_estimate(&neighbor, &tool)));
+
+            //real_score.insert((neighbor, tool), tentative_real_score);
          }
       }
    }
@@ -395,6 +376,16 @@ impl fmt::Display for RegionType {
          RegionType::Rocky => write!(f, "\u{001B}[30m.\u{001B}[0m"),
          RegionType::Wet => write!(f, "\u{001B}[34m=\u{001B}[0m"),
          RegionType::Narrow => write!(f, "\u{001B}[31m|\u{001B}[0m"),
+      }
+   }
+}
+
+impl fmt::Display for Tool {
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+      match *self {
+         Tool::Torch => write!(f, "T"),
+         Tool::ClimbingGear => write!(f, "C"),
+         Tool::Neither => write!(f, " "),
       }
    }
 }
