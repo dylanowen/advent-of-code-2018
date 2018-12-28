@@ -1,12 +1,7 @@
 (function() {
     var wasm;
     const __exports = {};
-    /**
-    * @returns {void}
-    */
-    __exports.init = function() {
-        return wasm.init();
-    };
+
 
     let cachedTextEncoder = new TextEncoder('utf-8');
 
@@ -97,23 +92,6 @@
         return wasm.render_ground(arg0, arg1, arg2, arg3);
     };
 
-    /**
-    * @param {number} arg0
-    * @returns {number}
-    */
-    __exports.alloc_img_data = function(arg0) {
-        return wasm.alloc_img_data(arg0);
-    };
-
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @returns {void}
-    */
-    __exports.dealloc = function(arg0, arg1) {
-        return wasm.dealloc(arg0, arg1);
-    };
-
     let cachedTextDecoder = new TextDecoder('utf-8');
 
     function getStringFromWasm(ptr, len) {
@@ -127,6 +105,29 @@
         wasm.__wbindgen_free(arg0, arg1 * 1);
 
         console.error(varg0);
+    };
+    /**
+    * @returns {void}
+    */
+    __exports.init = function() {
+        return wasm.init();
+    };
+
+    /**
+    * @param {number} arg0
+    * @returns {number}
+    */
+    __exports.alloc_vec = function(arg0) {
+        return wasm.alloc_vec(arg0);
+    };
+
+    /**
+    * @param {number} arg0
+    * @param {number} arg1
+    * @returns {void}
+    */
+    __exports.dealloc_vec = function(arg0, arg1) {
+        return wasm.dealloc_vec(arg0, arg1);
     };
 
     function init(path_or_module) {

@@ -58,7 +58,7 @@
 
             // pixels are stored in RGBA
             imgByteSize = canvas.width * canvas.height * 4;
-            imgPointer = lib.alloc_img_data(imgByteSize);
+            imgPointer = lib.alloc_vec(imgByteSize);
 
             const usub = new Uint8ClampedArray(lib.wasm.memory.buffer, imgPointer, imgByteSize);
 
@@ -113,7 +113,7 @@
                 ground = null;
             }
             if (imgPointer !== null) {
-                lib.dealloc(imgPointer, imgByteSize);
+                lib.dealloc_vec(imgPointer, imgByteSize);
                 imgPointer = null;
             }
         }

@@ -1,0 +1,14 @@
+{
+  "name": "17",
+  "collaborators": [
+    "Dylan"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "web17_bg.wasm",
+    "web17.js",
+    "web17.d.ts"
+  ],
+  "browser": "web17.js",
+  "types": "web17.d.ts"
+}

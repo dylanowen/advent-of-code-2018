@@ -1,0 +1,14 @@
+{
+  "name": "18",
+  "collaborators": [
+    "Dylan"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "web18_bg.wasm",
+    "web18.js",
+    "web18.d.ts"
+  ],
+  "browser": "web18.js",
+  "types": "web18.d.ts"
+}

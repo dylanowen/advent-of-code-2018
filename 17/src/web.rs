@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 use common::coordinates::Grid;
 use common::coordinates::OffsetLociX;
 use common::coordinates::OffsetLociY;
+use common::canvas::render_grid;
 
 pub use common::wasm::*;
 
@@ -71,38 +72,22 @@ pub fn render_ground(pixel_size: usize, img_data_pointer: *mut u32, ground: *mut
       (ground, img_data)
    };
 
-   let row_width = ground.width() * pixel_size;
-
-   for ground_y in ground.y_range() {
-      let y = ground.raw_y(ground_y) as usize;
-      for ground_x in ground.x_range() {
-         let x = ground.raw_x(ground_x) as usize;
-
-         let start_x = x * pixel_size;
-         let end_x = start_x + pixel_size;
-         let start_y = y * pixel_size;
-         let end_y = start_y + pixel_size;
-
-         let mut water = false;
-         let color: u32 = match ground.get(ground_x, ground_y) {
-            Ground::Clay => 0x6d5800FF,
-            Ground::Sand => 0xbeaf70FF,
-            _ => {
-               water = true;
-               0x5dade2FF
-            }
-         };
-
-         if full_render || water {
-            for img_y in start_y..end_y {
-               for img_x in start_x..end_x {
-                  let pixel = (img_y * row_width) + img_x;
-
-                  // flip our endianness to match the actual u8 byte array
-                  img_data[pixel] = color.to_be();
-               }
-            }
+   render_grid(pixel_size, img_data, &ground, &|cell| {
+      let mut water = false;
+      let color = match cell {
+         Ground::Clay => 0x6d5800FF,
+         Ground::Sand => 0xbeaf70FF,
+         _ => {
+            water = true;
+            0x5dade2FF
          }
+      };
+
+      if full_render || water {
+         Some(color)
       }
-   }
+      else {
+         None
+      }
+   });
 }
