@@ -85,7 +85,7 @@ fn a(program: &Vec<Instruction>) -> usize {
    run_program(vec![11474091, 0, 0, 0, 0, 0], program)
 }
 
-fn b(program: &Vec<Instruction>) -> usize {
+fn b(_program: &Vec<Instruction>) -> usize {
    //run_program(vec![0, 0, 0, 0, 0, 0], program);
 
    let zero: usize = 0;

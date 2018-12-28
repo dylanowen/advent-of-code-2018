@@ -4,6 +4,8 @@ use std::fmt::Debug;
 use std::time::{Instant, Duration};
 
 pub mod coordinates;
+pub mod wasm;
+pub mod canvas;
 
 pub fn run_day<R>(day: &str, runner: &R) where
    R: Fn(&String, bool) {
