@@ -2,6 +2,9 @@
 
 https://adventofcode.com/2018
 
+## WASM Visualizations
+https://dylanowen.github.io/advent-of-code-2018/
+
 ## Running
 
 `cargo run --bin <day>`
