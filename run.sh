@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cargo build
+cargo build --release
 
 for ((i=1;i<=25;i++)); do
   if [ -d "$i" ]; then

@@ -286,6 +286,11 @@ pub struct Loci {
 }
 
 impl Loci {
+
+   pub fn min_value() -> Loci {
+      Loci::new(isize::min_value(), isize::min_value())
+   }
+
    pub fn max_value() -> Loci {
       Loci::new(isize::max_value(), isize::max_value())
    }

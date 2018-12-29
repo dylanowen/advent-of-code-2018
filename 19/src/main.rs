@@ -82,7 +82,7 @@ fn main() {
       if is_sample {
          assert_eq!(6, a_result);
       } else {
-         let b_result = b(&program);
+         let b_result = b();
          println!("Result B: {}", b_result);
       }
    });
@@ -92,7 +92,7 @@ fn a(program: &Vec<Instruction>) -> usize {
    run_program(vec![0, 0, 0, 0, 0, 0], program)
 }
 
-fn b(program: &Vec<Instruction>) -> u64 {
+fn b() -> u64 {
    let mut zero: u64 = 0;
    let two: u64 = 10551354;
    let mut four: u64 = 1;
