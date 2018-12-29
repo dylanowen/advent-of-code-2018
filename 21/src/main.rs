@@ -1,5 +1,6 @@
 use regex::Regex;
 use std::fmt;
+use std::collections::BTreeSet;
 
 use common::*;
 
@@ -76,8 +77,8 @@ fn main() {
    run_input("21", "input.txt", &|contents| {
       let program = parse_input(contents);
 
-      //println!("Result A: {}", a(&program));
-      println!("Result B: {}", b(&program));
+      println!("Result A: {}", a(&program));
+      println!("Result B: {}", b());
    });
 }
 
@@ -85,23 +86,27 @@ fn a(program: &Vec<Instruction>) -> usize {
    run_program(vec![11474091, 0, 0, 0, 0, 0], program)
 }
 
-fn b(_program: &Vec<Instruction>) -> usize {
-   //run_program(vec![0, 0, 0, 0, 0, 0], program);
+fn b() -> usize {
+   // transpiled the input into Rust for speed
 
-   let zero: usize = 0;
-   let mut one: usize = 0;
+   let mut one: usize;
    let mut three: usize = 0;
-   let mut four: usize = 0;
-   let mut five: usize = 0;
+   let mut four: usize;
 
+   /*
+      Strategy:
+
+      Basically we're searching for a cycle in the output, once we find one. The result right before that
+      should be our max
+   */
+
+   let mut seen = BTreeSet::new();
+   let mut last = 0;
    loop {
-      println!("outer: {:5} {:8} {:5} {:5}", one, three, four, five);
       four = three | 0x10000;
       three = 2176960;
 
       'mid: loop {
-         println!("mid:   {:5} {:8} {:5} {:5}", one, three, four, five);
-
          one = four & 0xFF;
          three += one;
          three = three & 0xFFFFFF;
@@ -115,14 +120,13 @@ fn b(_program: &Vec<Instruction>) -> usize {
          four = four / 256
       }
 
-      //println!("{}", three);
-
-      if three == zero {
-         break;
+      if !seen.insert(three) {
+         // return the value right before our cycle
+         return last;
       }
-   }
 
-   0
+      last = three;
+   }
 }
 
 fn run_program(initial_registers: Vec<usize>, program: &Vec<Instruction>) -> usize {
