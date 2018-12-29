@@ -1,8 +1,6 @@
 use regex::Regex;
 use std::fmt;
 use std::cell::RefCell;
-use std::collections::HashMap;
-use std::collections::BTreeSet;
 
 use common::*;
 

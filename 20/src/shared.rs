@@ -174,7 +174,7 @@ fn prune_map(old_map: Grid<MapFeature>) -> Grid<MapFeature> {
       }
    }
 
-   // add some outer walls back int
+   // add some outer walls back in
    min = min.sub(1, 1);
    max = max.add(2, 2);
 

@@ -34,7 +34,7 @@ pub fn run_input<R>(day: &str, file_name: &str, runner: &R) where
    let random_color_index = (rand::random::<u8>() % 5) + 2;
    let color = format!("\u{001B}[3{}m", random_color_index);
 
-   println!("{}Running:\u{001B}[0m {}", color, file_name);
+   println!("{}Running {}:\u{001B}[0m {}", color, day, file_name);
 
    let elapsed = benchmark(|| {
       runner(&input);
