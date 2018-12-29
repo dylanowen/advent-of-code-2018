@@ -27,52 +27,69 @@
     * @param {string} arg0
     * @returns {number}
     */
-    __exports.new_lumberyard = function(arg0) {
+    __exports.new_ground = function(arg0) {
         const ptr0 = passStringToWasm(arg0);
         const len0 = WASM_VECTOR_LEN;
-        return wasm.new_lumberyard(ptr0, len0);
+        return wasm.new_ground(ptr0, len0);
     };
 
     /**
     * @param {number} arg0
     * @returns {void}
     */
-    __exports.delete_lumberyard = function(arg0) {
-        return wasm.delete_lumberyard(arg0);
+    __exports.delete_ground = function(arg0) {
+        return wasm.delete_ground(arg0);
     };
 
     /**
     * @param {number} arg0
     * @returns {number}
     */
-    __exports.lumberyard_width = function(arg0) {
-        return wasm.lumberyard_width(arg0);
+    __exports.ground_width = function(arg0) {
+        return wasm.ground_width(arg0);
     };
 
     /**
     * @param {number} arg0
     * @returns {number}
     */
-    __exports.lumberyard_height = function(arg0) {
-        return wasm.lumberyard_height(arg0);
+    __exports.ground_height = function(arg0) {
+        return wasm.ground_height(arg0);
     };
 
     /**
     * @param {number} arg0
-    * @returns {void}
+    * @returns {boolean}
     */
-    __exports.tick_lumberyard = function(arg0) {
-        return wasm.tick_lumberyard(arg0);
+    __exports.tick_ground = function(arg0) {
+        return (wasm.tick_ground(arg0)) !== 0;
+    };
+
+    /**
+    * @param {number} arg0
+    * @returns {number}
+    */
+    __exports.get_water_count = function(arg0) {
+        return wasm.get_water_count(arg0);
+    };
+
+    /**
+    * @param {number} arg0
+    * @returns {number}
+    */
+    __exports.get_water_locked = function(arg0) {
+        return wasm.get_water_locked(arg0);
     };
 
     /**
     * @param {number} arg0
     * @param {number} arg1
     * @param {number} arg2
+    * @param {boolean} arg3
     * @returns {void}
     */
-    __exports.render_lumberyard = function(arg0, arg1, arg2) {
-        return wasm.render_lumberyard(arg0, arg1, arg2);
+    __exports.render_ground = function(arg0, arg1, arg2, arg3) {
+        return wasm.render_ground(arg0, arg1, arg2, arg3);
     };
 
     let cachedTextDecoder = new TextDecoder('utf-8');
@@ -115,7 +132,7 @@
 
     function init(path_or_module) {
         let instantiation;
-        const imports = { './web18': __exports };
+        const imports = { './web': __exports };
         if (path_or_module instanceof WebAssembly.Module) {
             instantiation = WebAssembly.instantiate(path_or_module, imports)
             .then(instance => {
