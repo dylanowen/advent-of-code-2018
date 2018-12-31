@@ -55,7 +55,9 @@
             ctx.putImageData(img, 0, 0);
 
             function step() {
-                running = lib.render_next_path(pathIter, stepSize.value, pixelSize, imgPointer, map);
+                if (running) {
+                    running = lib.render_next_path(pathIter, stepSize.value, pixelSize, imgPointer, map);
+                }
 
                 if (!running) {
                     lib.render_map(pixelSize, imgPointer, map, false);
@@ -108,7 +110,10 @@
         function input_changed() {
             const input_str = input.value;
 
-            start(input_str);
+            stop();
+
+            // make sure we don't enter in the middle of a drawing
+            window.requestAnimationFrame(() => start(input_str));
         }
 
         input.addEventListener('input', input_changed);

@@ -101,7 +101,10 @@
         function input_changed() {
             const input_str = input.value;
 
-            start(input_str);
+            stop();
+
+            // make sure we don't enter in the middle of a drawing
+            window.requestAnimationFrame(() => start(input_str));
         }
 
         input.addEventListener('input', input_changed);
