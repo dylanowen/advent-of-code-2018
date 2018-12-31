@@ -101,7 +101,8 @@
         input.addEventListener('input', input_changed);
 
         input_changed();
-    });
+    })
+        .catch((e) => console.error(e));
 </script>
 <textarea id="input_area">
 |##.....|...||..#.........||.##....#|..#.##|..#..#

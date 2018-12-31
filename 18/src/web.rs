@@ -26,7 +26,6 @@ pub fn delete_lumberyard(lumberyard: *mut Grid<Acre>) {
    }
 }
 
-//
 #[wasm_bindgen]
 pub fn lumberyard_width(lumberyard: *mut Grid<Acre>) -> usize {
    let lumberyard = unsafe { &mut *lumberyard };
