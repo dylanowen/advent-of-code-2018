@@ -183,34 +183,10 @@ impl<'a> Iterator for PathSegmentsIterator<'a> {
             option_result
          }
          None => {
-            match self.loci_iter.next() {
-               Some(next_loci) => {
-                  // start our iteration over again
-                  self.path_iter = self.last_segment.path_iterator(&next_loci);
+            // we're done with this route so grab the last locis
+            self.last_locis.append(&mut self.path_iter.last_locis());
 
-                  self.next()
-               }
-               None => {
-                  // we're done with this route so grab the last locis
-                  self.last_locis.append(&mut self.path_iter.last_locis());
-
-                  match self.segment_iter.next() {
-                     Some(next_segment) => {
-                        self.last_segment = Box::new(next_segment);
-
-                        // swap out our loci iterators for a new empty set and get the next round of iterators
-                        //println!("Segments next {:?}", self.last_locis);
-                        self.loci_iter = mem::replace(&mut self.last_locis, BTreeSet::new()).into_iter();
-
-                        self.next()
-                     }
-                     None => {
-                        // we're done
-                        None
-                     }
-                  }
-               }
-            }
+            self.next_loci_iter()
          }
       }
    }
@@ -219,6 +195,36 @@ impl<'a> Iterator for PathSegmentsIterator<'a> {
 impl<'a> PathIterator for PathSegmentsIterator<'a> {
    fn last_locis(&self) -> BTreeSet<Loci> {
       self.last_locis.clone()
+   }
+}
+
+impl<'a> PathSegmentsIterator<'a> {
+   fn next_loci_iter(&mut self) -> Option<MapMove> {
+      match self.loci_iter.next() {
+         Some(next_loci) => {
+            // start our iteration over again
+            self.path_iter = self.last_segment.path_iterator(&next_loci);
+
+            self.next()
+         }
+         None => {
+            match self.segment_iter.next() {
+               Some(next_segment) => {
+                  self.last_segment = Box::new(next_segment);
+
+                  // swap out our loci iterators for a new empty set and get the next round of iterators
+                  self.loci_iter = mem::replace(&mut self.last_locis, BTreeSet::new()).into_iter();
+
+                  // start our iteration over again
+                  self.next_loci_iter()
+               }
+               None => {
+                  // we're done
+                  None
+               }
+            }
+         }
+      }
    }
 }
 

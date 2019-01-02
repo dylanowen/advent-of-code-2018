@@ -9,11 +9,34 @@
 // hack when deploying over HTTP.
 delete WebAssembly.instantiateStreaming;
 
+(function () {
+    let _libReady = null;
+    window.LibReady = function (prefix) {
+        if (_libReady !== null) {
+            return _libReady;
+        } else {
+            _libReady = Promise
+                .all([
+                    new Promise((resolve, reject) => {
+                        const element = document.createElement('script');
+                        element.onload = resolve;
+                        element.onerror = reject;
+                        element.async = true;
+                        element.src = './pkg/' + prefix + '.js';
 
-const LibReady = new Promise((resolve) => window.addEventListener('load', resolve)).then(async () => {
-    await wasm_bindgen('./pkg/web_bg.wasm');
-    wasm_bindgen.init();
+                        document.body.appendChild(element);
+                    }),
+                    new Promise((resolve) => window.addEventListener('load', resolve)),
+                ])
+                .then(async () => {
+                    await wasm_bindgen('./pkg/' + prefix + '_bg.wasm');
+                    wasm_bindgen.init();
 
-    console.log("Lib Loaded");
-    return wasm_bindgen;
-});
+                    console.log("Lib Loaded");
+                    return wasm_bindgen;
+                });
+
+            return _libReady;
+        }
+    }
+})();

@@ -167,7 +167,7 @@
 
     function init(path_or_module) {
         let instantiation;
-        const imports = { './web': __exports };
+        const imports = { './web20': __exports };
         if (path_or_module instanceof WebAssembly.Module) {
             instantiation = WebAssembly.instantiate(path_or_module, imports)
             .then(instance => {

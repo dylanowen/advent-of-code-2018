@@ -6,7 +6,7 @@ mod shared;
 
 fn main() {
    run_tests("20", "test_input_{}.txt",
-             vec![3, 10, 18, 23, 31],
+             vec![3, 10, 18, 23, 31, 6],
              &|contents| {
                 let (center, map) = build_map(&parse_input(contents));
 

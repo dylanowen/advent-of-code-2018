@@ -13,7 +13,7 @@ console_error_panic_hook = "0.1.5"
 name = "20"
 
 [lib]
-name = "web"
+name = "web20"
 path = "src/web.rs"
 crate-type = ["cdylib", "rlib"]
 

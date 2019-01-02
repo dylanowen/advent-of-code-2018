@@ -11,7 +11,7 @@ wasm-bindgen = "0.2"
 console_error_panic_hook = "0.1.5"
 
 [lib]
-name = "web"
+name = "web17"
 path = "src/web.rs"
 crate-type = ["cdylib", "rlib"]
 
