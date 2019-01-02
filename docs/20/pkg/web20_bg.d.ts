@@ -1,9 +1,12 @@
 /* tslint:disable */
 export const memory: WebAssembly.Memory;
 export function render_next_path(a: number, b: number, c: number, d: number, e: number): number;
+export function render_distance(a: number, b: number, c: number, d: number, e: number): number;
 export function render_map(a: number, b: number, c: number, d: number): void;
 export function calculate_max_distance(a: number): number;
 export function calculate_total_far_distances(a: number): number;
+export function new_locations(a: number): number;
+export function delete_locations(a: number): void;
 export function new_path(a: number, b: number): number;
 export function delete_path(a: number): void;
 export function new_map(a: number): number;

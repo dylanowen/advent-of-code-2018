@@ -22,6 +22,7 @@
         let path = null;
         let map = null;
         let pathIter = null;
+        let locations = null;
         let imgByteSize = 0;
         let imgPointer = null;
 
@@ -34,6 +35,7 @@
             path = lib.new_path(input);
             map = lib.new_map(path);
             pathIter = lib.new_path_iter(path, map);
+            locations = lib.new_locations(map);
 
             canvas.width = lib.map_width(map) * pixelSize;
             canvas.height = lib.map_height(map) * pixelSize;
@@ -50,23 +52,35 @@
 
             // run our initial full render
             lib.render_map(pixelSize, imgPointer, map, true);
-            ctx.putImageData(img, 0, 0);
 
-            function step() {
+            // set which stage we're running
+            let stage = traversal_step;
+            function traversal_step() {
                 if (running) {
-                    running = lib.render_next_path(pathIter, stepSize.value, pixelSize, imgPointer, map);
+                    if (!lib.render_next_path(pathIter, stepSize.value, pixelSize, imgPointer, map)) {
+                        lib.render_map(pixelSize, imgPointer, map, false);
+
+                        console.log("Traversal Done!");
+
+                        // move to our next stage
+                        stage = distance_step;
+                    }
+
+                    window.requestAnimationFrame(draw);
                 }
+            }
 
-                if (!running) {
-                    lib.render_map(pixelSize, imgPointer, map, false);
-                    ctx.putImageData(img, 0, 0);
+            function distance_step() {
+                if (running) {
+                    if (!lib.render_distance(locations, stepSize.value, pixelSize, imgPointer, map)) {
+                        answerA.textContent = lib.calculate_max_distance(map);
+                        answerB.textContent = lib.calculate_total_far_distances(map);
 
-                    answerA.textContent = lib.calculate_max_distance(map);
-                    answerB.textContent = lib.calculate_total_far_distances(map);
+                        stop();
 
-                    console.log("Done!");
-                    stop();
-                } else {
+                        console.log("Distance Done!");
+                    }
+
                     window.requestAnimationFrame(draw);
                 }
             }
@@ -75,13 +89,12 @@
                 ctx.putImageData(img, 0, 0);
 
                 if (running) {
-                    window.requestAnimationFrame(step);
+                    window.requestAnimationFrame(stage);
                 }
             }
 
 
-            window.requestAnimationFrame(step);
-            //nextButton.addEventListener('click', step);
+            draw();
         }
 
         function stop() {
@@ -97,6 +110,10 @@
             if (pathIter !== null) {
                 lib.delete_path_iter(pathIter);
                 pathIter = null;
+            }
+            if (locations !== null) {
+                lib.delete_locations(locations);
+                locations = null;
             }
             if (imgPointer !== null) {
                 lib.dealloc_vec(imgPointer, imgByteSize);
