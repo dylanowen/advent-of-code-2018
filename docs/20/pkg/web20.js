@@ -19,10 +19,11 @@
     * @param {number} arg2
     * @param {number} arg3
     * @param {number} arg4
+    * @param {number} arg5
     * @returns {boolean}
     */
-    __exports.render_distance = function(arg0, arg1, arg2, arg3, arg4) {
-        return (wasm.render_distance(arg0, arg1, arg2, arg3, arg4)) !== 0;
+    __exports.render_distance = function(arg0, arg1, arg2, arg3, arg4, arg5) {
+        return (wasm.render_distance(arg0, arg1, arg2, arg3, arg4, arg5)) !== 0;
     };
 
     /**
@@ -155,107 +156,66 @@
         return wasm.delete_path_iter(arg0);
     };
 
-    const heap = new Array(32);
+    let cachedTextDecoder = new TextDecoder('utf-8');
 
-    heap.fill(undefined);
-
-    heap.push(undefined, null, true, false);
-
-function getObject(idx) { return heap[idx]; }
-
-const __widl_f_log_1__target = console.log;
-
-__exports.__widl_f_log_1_ = function(arg0) {
-    __widl_f_log_1__target(getObject(arg0));
-};
-
-let cachedTextDecoder = new TextDecoder('utf-8');
-
-function getStringFromWasm(ptr, len) {
-    return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-}
-
-__exports.__wbg_error_cc95a3d302735ca3 = function(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-
-    varg0 = varg0.slice();
-    wasm.__wbindgen_free(arg0, arg1 * 1);
-
-    console.error(varg0);
-};
-/**
-* @returns {void}
-*/
-__exports.init = function() {
-    return wasm.init();
-};
-
-/**
-* @param {number} arg0
-* @returns {number}
-*/
-__exports.alloc_vec = function(arg0) {
-    return wasm.alloc_vec(arg0);
-};
-
-/**
-* @param {number} arg0
-* @param {number} arg1
-* @returns {void}
-*/
-__exports.dealloc_vec = function(arg0, arg1) {
-    return wasm.dealloc_vec(arg0, arg1);
-};
-
-let heap_next = heap.length;
-
-function dropObject(idx) {
-    if (idx < 36) return;
-    heap[idx] = heap_next;
-    heap_next = idx;
-}
-
-__exports.__wbindgen_object_drop_ref = function(i) { dropObject(i); };
-
-function addHeapObject(obj) {
-    if (heap_next === heap.length) heap.push(heap.length + 1);
-    const idx = heap_next;
-    heap_next = heap[idx];
-
-    heap[idx] = obj;
-    return idx;
-}
-
-__exports.__wbindgen_string_new = function(p, l) {
-    return addHeapObject(getStringFromWasm(p, l));
-};
-
-__exports.__wbindgen_throw = function(ptr, len) {
-    throw new Error(getStringFromWasm(ptr, len));
-};
-
-function init(path_or_module) {
-    let instantiation;
-    const imports = { './web20': __exports };
-    if (path_or_module instanceof WebAssembly.Module) {
-        instantiation = WebAssembly.instantiate(path_or_module, imports)
-        .then(instance => {
-        return { instance, module: path_or_module }
-    });
-} else {
-    const data = fetch(path_or_module);
-    if (typeof WebAssembly.instantiateStreaming === 'function') {
-        instantiation = WebAssembly.instantiateStreaming(data, imports);
-    } else {
-        instantiation = data
-        .then(response => response.arrayBuffer())
-        .then(buffer => WebAssembly.instantiate(buffer, imports));
+    function getStringFromWasm(ptr, len) {
+        return cachedTextDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
     }
-}
-return instantiation.then(({instance}) => {
-    wasm = init.wasm = instance.exports;
 
-});
+    __exports.__wbg_error_cc95a3d302735ca3 = function(arg0, arg1) {
+        let varg0 = getStringFromWasm(arg0, arg1);
+
+        varg0 = varg0.slice();
+        wasm.__wbindgen_free(arg0, arg1 * 1);
+
+        console.error(varg0);
+    };
+    /**
+    * @returns {void}
+    */
+    __exports.init = function() {
+        return wasm.init();
+    };
+
+    /**
+    * @param {number} arg0
+    * @returns {number}
+    */
+    __exports.alloc_vec = function(arg0) {
+        return wasm.alloc_vec(arg0);
+    };
+
+    /**
+    * @param {number} arg0
+    * @param {number} arg1
+    * @returns {void}
+    */
+    __exports.dealloc_vec = function(arg0, arg1) {
+        return wasm.dealloc_vec(arg0, arg1);
+    };
+
+    function init(path_or_module) {
+        let instantiation;
+        const imports = { './web20': __exports };
+        if (path_or_module instanceof WebAssembly.Module) {
+            instantiation = WebAssembly.instantiate(path_or_module, imports)
+            .then(instance => {
+            return { instance, module: path_or_module }
+        });
+    } else {
+        const data = fetch(path_or_module);
+        if (typeof WebAssembly.instantiateStreaming === 'function') {
+            instantiation = WebAssembly.instantiateStreaming(data, imports);
+        } else {
+            instantiation = data
+            .then(response => response.arrayBuffer())
+            .then(buffer => WebAssembly.instantiate(buffer, imports));
+        }
+    }
+    return instantiation.then(({instance}) => {
+        wasm = init.wasm = instance.exports;
+
+    });
 };
 self.wasm_bindgen = Object.assign(init, __exports);
 })();

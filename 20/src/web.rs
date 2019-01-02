@@ -11,14 +11,12 @@ use common::coordinates::OffsetLociY;
 use common::canvas::{render_grid, set_grid_square};
 
 pub use common::wasm::*;
-use web_sys::console;
 
 use crate::shared::*;
 
 mod shared;
 
 const MAX_BRIGHTNESS: u32 = 0xDD;
-const MAX_COLOR_DISTANCE: u32 = 4000;
 
 #[wasm_bindgen]
 pub fn render_next_path(path_iter: *mut Box<PathIterator<Item=MapMove>>,
@@ -69,6 +67,7 @@ pub fn render_next_path(path_iter: *mut Box<PathIterator<Item=MapMove>>,
 pub fn render_distance(locations_pointer: *mut (BTreeSet<Loci>, Grid<usize>),
                        step_size: usize,
                        pixel_size: usize,
+                       max_distance: usize,
                        img_data_pointer: *mut u32,
                        map_pointer: *mut (Loci, Grid<MapFeature>)) -> bool {
    let (locations, distance_grid, img_data, map) = unsafe {
@@ -105,14 +104,13 @@ pub fn render_distance(locations_pointer: *mut (BTreeSet<Loci>, Grid<usize>),
 
                   next_locations.insert(room);
 
-                  let distance_fraction = (neighbor_distance as u32) * MAX_BRIGHTNESS / MAX_COLOR_DISTANCE;
+                  let distance_fraction = (neighbor_distance as u32) * MAX_BRIGHTNESS / max_distance as u32;
                   let gray_scale = MAX_BRIGHTNESS - (0xFF & distance_fraction);
                   let red = gray_scale << 24;
                   let green = gray_scale << 16;
                   let blue = gray_scale << 8;
 
                   let color = 0x000000FF | red | green | blue;
-                  console::log_1(&format!("{:x} {:x} {:x} {:x} {:x}", distance_fraction, gray_scale, red, green, color).into());
                   for loci in [*door, room].iter() {
                      set_grid_square(
                         loci.x(),

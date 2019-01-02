@@ -50,6 +50,8 @@
 
             const img = new ImageData(usub, canvas.width, canvas.height);
 
+            let maxDistance = 0;
+
             // run our initial full render
             lib.render_map(pixelSize, imgPointer, map, true);
 
@@ -59,6 +61,8 @@
                 if (running) {
                     if (!lib.render_next_path(pathIter, stepSize.value, pixelSize, imgPointer, map)) {
                         lib.render_map(pixelSize, imgPointer, map, false);
+
+                        maxDistance = lib.calculate_max_distance(map);
 
                         console.log("Traversal Done!");
 
@@ -72,8 +76,8 @@
 
             function distance_step() {
                 if (running) {
-                    if (!lib.render_distance(locations, stepSize.value, pixelSize, imgPointer, map)) {
-                        answerA.textContent = lib.calculate_max_distance(map);
+                    if (!lib.render_distance(locations, stepSize.value, pixelSize, maxDistance, imgPointer, map)) {
+                        answerA.textContent = maxDistance + "";
                         answerB.textContent = lib.calculate_total_far_distances(map);
 
                         stop();
